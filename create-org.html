@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — สร้าง Organization</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+body {
+  background: var(--surface-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sp-6);
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 520px;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: var(--sp-8);
+}
+.auth-logo-mark {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+.auth-logo-mark svg { width: 22px; height: 22px; }
+.auth-logo-text {
+  font-size: 22px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+.auth-logo-text span { color: var(--brand-600); }
+
+/* Step Indicator */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: var(--sp-8);
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: var(--r-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  border: 2px solid var(--n-200);
+  color: var(--text-tertiary);
+  background: var(--surface-primary);
+  transition: all var(--t-med) var(--ease);
+}
+.step.active .step-circle {
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+  border-color: var(--brand-500);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--brand-100);
+}
+.step.done .step-circle {
+  background: var(--success-500);
+  border-color: var(--success-500);
+  color: #fff;
+}
+.step-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  transition: color var(--t-fast);
+}
+.step.active .step-label { color: var(--text-primary); font-weight: 600; }
+.step.done .step-label { color: var(--success-700); }
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: var(--n-200);
+  margin: 0 var(--sp-3);
+  transition: background var(--t-med);
+}
+.step-line.done { background: var(--success-500); }
+
+/* Card */
+.auth-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-10);
+}
+
+.step-content { display: none; }
+.step-content.active { display: block; }
+
+.step-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--sp-1);
+}
+.step-content .step-subtitle {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-bottom: var(--sp-8);
+}
+
+.form-group {
+  margin-bottom: var(--sp-5);
+}
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-2);
+}
+
+/* Color Picker */
+.color-picker {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.color-swatch {
+  width: 36px; height: 36px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: all var(--t-fast) var(--ease);
+  position: relative;
+}
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.selected {
+  border-color: var(--n-900);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+.color-swatch.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/16px no-repeat;
+}
+
+/* Upload area */
+.upload-area {
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--r-lg);
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.upload-area:hover { border-color: var(--brand-400); background: var(--brand-50); }
+.upload-area svg { width: 36px; height: 36px; color: var(--text-tertiary); margin-bottom: var(--sp-2); }
+.upload-area p { font-size: 13px; color: var(--text-tertiary); }
+.upload-area .upload-hint { font-size: 11px; color: var(--text-disabled); margin-top: var(--sp-1); }
+.upload-area.has-file { border-color: var(--success-500); background: var(--success-50); }
+.upload-area.has-file svg { color: var(--success-500); }
+.upload-area.has-file p { color: var(--success-700); font-weight: 600; }
+
+/* Invite list */
+.invite-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.invite-row {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
+.invite-row .input { flex: 1; }
+.invite-row select {
+  height: 40px;
+  padding: 0 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface-primary);
+  border: 1.5px solid var(--border-primary);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-xs);
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+.invite-row select:focus { border-color: var(--brand-500); box-shadow: var(--shadow-focus); }
+.invite-remove {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--text-tertiary);
+  background: none; border: none;
+  transition: all var(--t-fast);
+}
+.invite-remove:hover { background: var(--error-50); color: var(--error-500); }
+.invite-remove svg { width: 16px; height: 16px; }
+
+.add-invite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-600);
+  cursor: pointer;
+  background: none; border: none;
+  font-family: var(--font-sans);
+  padding: 4px 0;
+}
+.add-invite-btn:hover { color: var(--brand-700); }
+.add-invite-btn svg { width: 16px; height: 16px; }
+
+/* Footer buttons */
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--sp-8);
+  gap: var(--sp-3);
+}
+.step-footer .btn { min-width: 120px; }
+
+.skip-link {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  background: none; border: none;
+  font-family: var(--font-sans);
+}
+.skip-link:hover { color: var(--text-secondary); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="auth-wrapper animate-in">
+  <!-- Logo -->
+  <div class="auth-logo">
+    <div class="auth-logo-mark">
+      <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="auth-logo-text">Work<span>Flow</span></div>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator">
+    <div class="step active" id="stepInd1">
+      <div class="step-circle">1</div>
+      <span class="step-label">สร้าง Org</span>
+    </div>
+    <div class="step-line" id="stepLine"></div>
+    <div class="step" id="stepInd2">
+      <div class="step-circle">2</div>
+      <span class="step-label">เชิญทีม</span>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="auth-card">
+
+    <!-- STEP 1: Create Org -->
+    <div class="step-content active" id="step1">
+      <h2>สร้าง Organization</h2>
+      <p class="step-subtitle">ตั้งชื่อและกำหนดรูปลักษณ์ให้องค์กรของคุณ</p>
+
+      <div class="form-group">
+        <label class="form-label">ชื่อ Organization</label>
+        <input type="text" class="input" id="orgName" placeholder="เช่น Egency, บริษัท ABC" value="Egency">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">เลือกสีประจำ</label>
+        <div class="color-picker" id="colorPicker">
+          <div class="color-swatch selected" style="background: #6172f3;" data-color="#6172f3"></div>
+          <div class="color-swatch" style="background: #12b76a;" data-color="#12b76a"></div>
+          <div class="color-swatch" style="background: #f79009;" data-color="#f79009"></div>
+          <div class="color-swatch" style="background: #f04438;" data-color="#f04438"></div>
+          <div class="color-swatch" style="background: #6e40c9;" data-color="#6e40c9"></div>
+          <div class="color-swatch" style="background: #2e90fa;" data-color="#2e90fa"></div>
+          <div class="color-swatch" style="background: #ee46bc;" data-color="#ee46bc"></div>
+          <div class="color-swatch" style="background: #0ea5e9;" data-color="#0ea5e9"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">โลโก้ (ไม่บังคับ)</label>
+        <div class="upload-area" id="uploadArea" onclick="fakeUpload()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          <p id="uploadText">คลิกเพื่ออัปโหลดโลโก้</p>
+          <p class="upload-hint">PNG, JPG สูงสุด 2MB</p>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <a href="register.html" class="skip-link">ย้อนกลับ</a>
+        <button class="btn btn-primary btn-md" onclick="goToStep2()">ถัดไป</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Invite Team -->
+    <div class="step-content" id="step2">
+      <h2>เชิญทีมของคุณ</h2>
+      <p class="step-subtitle">เพิ่มสมาชิกเพื่อเริ่มทำงานร่วมกัน</p>
+
+      <div class="invite-list" id="inviteList">
+        <div class="invite-row">
+          <input type="email" class="input" placeholder="email@example.com" value="patchara@egency.co">
+          <select>
+            <option value="admin">Admin</option>
+            <option value="pm" selected>PM</option>
+            <option value="member">Member</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button class="invite-remove" onclick="removeInvite(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="invite-row">
+          <input type="email" class="input" placeholder="email@example.com" value="aran@egency.co">
+          <select>
+            <option value="admin">Admin</option>
+            <option value="pm">PM</option>
+            <option value="member" selected>Member</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button class="invite-remove" onclick="removeInvite(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="invite-row">
+          <input type="email" class="input" placeholder="email@example.com" value="somchai@egency.co">
+          <select>
+            <option value="admin">Admin</option>
+            <option value="pm">PM</option>
+            <option value="member" selected>Member</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button class="invite-remove" onclick="removeInvite(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="add-invite-btn" onclick="addInviteRow()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        เพิ่มสมาชิก
+      </button>
+
+      <div class="step-footer">
+        <button class="btn btn-secondary btn-md" onclick="goToStep1()">ย้อนกลับ</button>
+        <div style="display:flex; gap:var(--sp-3); align-items:center;">
+          <button class="skip-link" onclick="window.location.href='dashboard.html'">ข้ามขั้นตอนนี้</button>
+          <button class="btn btn-primary btn-md" onclick="finishSetup()">เสร็จสิ้น</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* Color picker */
+document.getElementById('colorPicker').addEventListener('click', function(e) {
+  const swatch = e.target.closest('.color-swatch');
+  if (!swatch) return;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  swatch.classList.add('selected');
+});
+
+/* Fake upload */
+function fakeUpload() {
+  const area = document.getElementById('uploadArea');
+  const text = document.getElementById('uploadText');
+  area.classList.add('has-file');
+  text.textContent = 'egency-logo.png อัปโหลดแล้ว';
+}
+
+/* Step navigation */
+function goToStep2() {
+  const orgName = document.getElementById('orgName').value.trim();
+  if (!orgName) {
+    document.getElementById('orgName').focus();
+    return;
+  }
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+  document.getElementById('stepInd1').classList.remove('active');
+  document.getElementById('stepInd1').classList.add('done');
+  document.getElementById('stepInd1').querySelector('.step-circle').innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+  document.getElementById('stepLine').classList.add('done');
+  document.getElementById('stepInd2').classList.add('active');
+}
+
+function goToStep1() {
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('stepInd2').classList.remove('active');
+  document.getElementById('stepInd1').classList.remove('done');
+  document.getElementById('stepInd1').classList.add('active');
+  document.getElementById('stepInd1').querySelector('.step-circle').textContent = '1';
+  document.getElementById('stepLine').classList.remove('done');
+}
+
+/* Invite rows */
+function addInviteRow() {
+  const list = document.getElementById('inviteList');
+  const row = document.createElement('div');
+  row.className = 'invite-row';
+  row.innerHTML = '<input type="email" class="input" placeholder="email@example.com">' +
+    '<select><option value="admin">Admin</option><option value="pm">PM</option><option value="member" selected>Member</option><option value="viewer">Viewer</option></select>' +
+    '<button class="invite-remove" onclick="removeInvite(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>';
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function removeInvite(btn) {
+  const row = btn.closest('.invite-row');
+  const list = document.getElementById('inviteList');
+  if (list.children.length > 1) {
+    row.remove();
+  }
+}
+
+/* Finish */
+function finishSetup() {
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

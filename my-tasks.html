@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — งานของฉัน</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* PAGE HEADER */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-6);
+}
+.page-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+.page-header p { font-size: 13px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* FILTER TABS */
+.filter-tabs {
+  display: flex; gap: var(--sp-2);
+  margin-bottom: var(--sp-6);
+}
+.filter-tab {
+  padding: 7px 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  background: var(--surface-primary);
+  font-family: var(--font-sans);
+  transition: all var(--t-fast) var(--ease);
+}
+.filter-tab:hover { border-color: var(--n-300); color: var(--text-primary); }
+.filter-tab.active {
+  background: var(--brand-500);
+  color: #fff;
+  border-color: var(--brand-500);
+}
+.filter-tab .tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px;
+  font-size: 11px; font-weight: 700;
+  border-radius: var(--r-full);
+  margin-left: 6px;
+  padding: 0 5px;
+}
+.filter-tab.active .tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+.filter-tab:not(.active) .tab-count { background: var(--n-100); color: var(--n-600); }
+
+/* PROJECT GROUP */
+.project-group {
+  margin-bottom: var(--sp-6);
+}
+.project-group-header {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  margin-bottom: var(--sp-2);
+}
+.project-group-header .proj-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.project-group-header h3 { font-size: 14px; font-weight: 700; }
+.project-group-header .group-count {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-tertiary);
+  background: var(--n-100);
+  padding: 1px 8px;
+  border-radius: var(--r-full);
+}
+
+/* TASK LIST */
+.task-list {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.task-row {
+  display: flex; align-items: center;
+  padding: var(--sp-3) var(--sp-5);
+  border-bottom: 1px solid var(--border-secondary);
+  gap: var(--sp-3);
+  transition: background var(--t-fast);
+  cursor: pointer;
+}
+.task-row:hover { background: var(--n-50); }
+.task-row:last-child { border-bottom: none; }
+
+.task-check {
+  width: 18px; height: 18px;
+  border: 2px solid var(--n-300);
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--t-fast);
+  flex-shrink: 0;
+}
+.task-check:hover { border-color: var(--brand-500); }
+.task-check.checked { background: var(--success-500); border-color: var(--success-500); }
+.task-check.checked::after {
+  content: '';
+  width: 10px; height: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white' stroke-width='3.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.task-name {
+  flex: 1;
+  font-size: 13.5px; font-weight: 500;
+  min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.task-name.done {
+  text-decoration: line-through;
+  color: var(--text-disabled);
+}
+
+.task-project {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+
+.task-due {
+  font-size: 12px; font-weight: 500;
+  color: var(--text-tertiary);
+  min-width: 90px;
+  display: flex; align-items: center; gap: 4px;
+}
+.task-due.overdue { color: var(--error-700); font-weight: 600; }
+.task-due.today { color: var(--warning-700); font-weight: 600; }
+
+.task-manday {
+  font-size: 12px; font-weight: 600; font-family: var(--font-mono);
+  color: var(--text-secondary);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* SUMMARY BAR */
+.summary-bar {
+  display: flex; gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--sp-6);
+}
+.summary-item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: 13px;
+}
+.summary-value { font-weight: 700; font-family: var(--font-mono); }
+.summary-label { color: var(--text-tertiary); }
+.summary-divider { width: 1px; background: var(--border-primary); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg>
+    </div>
+    <div class="sidebar-logo-text">Work<span>Flow</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
+    <a href="my-tasks.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
+    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
+    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
+    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
+    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่า</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">งานของฉัน</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">แดชบอร์ด</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      งานของฉัน
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="ค้นหางาน...">
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>งานของฉัน</h1>
+        <p>งานทั้งหมดที่ assign ให้คุณ — อัปเดตล่าสุด 9 เม.ย. 2569</p>
+      </div>
+    </div>
+
+    <!-- SUMMARY BAR -->
+    <div class="summary-bar animate-in">
+      <div class="summary-item">
+        <span class="summary-value" style="color:var(--brand-600)">12</span>
+        <span class="summary-label">งานทั้งหมด</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-value" style="color:var(--success-500)">5</span>
+        <span class="summary-label">เสร็จแล้ว</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-value" style="color:var(--warning-500)">4</span>
+        <span class="summary-label">กำลังทำ</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-value" style="color:var(--error-500)">2</span>
+        <span class="summary-label">Overdue</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-value">8.5</span>
+        <span class="summary-label">Man-day รวม</span>
+      </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs">
+      <button class="filter-tab" onclick="switchTab(this, 'today')">วันนี้ <span class="tab-count">3</span></button>
+      <button class="filter-tab active" onclick="switchTab(this, 'week')">อาทิตย์นี้ <span class="tab-count">7</span></button>
+      <button class="filter-tab" onclick="switchTab(this, 'next')">อาทิตย์หน้า <span class="tab-count">2</span></button>
+      <button class="filter-tab" onclick="switchTab(this, 'all')">ทั้งหมด <span class="tab-count">12</span></button>
+    </div>
+
+    <!-- JIGSAW ERP GROUP -->
+    <div class="project-group animate-in">
+      <div class="project-group-header">
+        <span class="proj-dot" style="background:#6172f3"></span>
+        <h3>Jigsaw ERP</h3>
+        <span class="group-count">5 งาน</span>
+      </div>
+      <div class="task-list">
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">ออกแบบ UI Dashboard</span>
+          <span class="status-pill s-overdue">Overdue</span>
+          <span class="task-due overdue">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            เลย 3 วัน
+          </span>
+          <span class="task-manday">1.5d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">API Integration — Payment Module</span>
+          <span class="status-pill s-review">Review</span>
+          <span class="task-due overdue">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            เลย 2 วัน
+          </span>
+          <span class="task-manday">2.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">Unit Test — Auth Module</span>
+          <span class="status-pill s-progress">In Progress</span>
+          <span class="task-due today">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            วันนี้
+          </span>
+          <span class="task-manday">1.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">Setup CI/CD Pipeline</span>
+          <span class="status-pill s-todo">Todo</span>
+          <span class="task-due">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            11 เม.ย.
+          </span>
+          <span class="task-manday">0.5d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check checked" onclick="toggleCheck(this)"></div>
+          <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name done">Responsive Layout</span>
+          <span class="status-pill s-done">Done</span>
+          <span class="task-due" style="color:var(--success-500)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            เสร็จแล้ว
+          </span>
+          <span class="task-manday">1.0d</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTT PLATFORM GROUP -->
+    <div class="project-group animate-in" style="animation-delay:0.1s">
+      <div class="project-group-header">
+        <span class="proj-dot" style="background:#12b76a"></span>
+        <h3>OTT Platform</h3>
+        <span class="group-count">4 งาน</span>
+      </div>
+      <div class="task-list">
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">สร้าง Streaming Player Component</span>
+          <span class="status-pill s-progress">In Progress</span>
+          <span class="task-due today">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            วันนี้
+          </span>
+          <span class="task-manday">2.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">Content Upload UI</span>
+          <span class="status-pill s-todo">Todo</span>
+          <span class="task-due">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            14 เม.ย.
+          </span>
+          <span class="task-manday">1.5d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check checked" onclick="toggleCheck(this)"></div>
+          <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name done">User Authentication Flow</span>
+          <span class="status-pill s-done">Done</span>
+          <span class="task-due" style="color:var(--success-500)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            เสร็จแล้ว
+          </span>
+          <span class="task-manday">1.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check checked" onclick="toggleCheck(this)"></div>
+          <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name done">Database Schema Design</span>
+          <span class="status-pill s-done">Done</span>
+          <span class="task-due" style="color:var(--success-500)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            เสร็จแล้ว
+          </span>
+          <span class="task-manday">0.5d</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI CHATBOT GROUP -->
+    <div class="project-group animate-in" style="animation-delay:0.2s">
+      <div class="project-group-header">
+        <span class="proj-dot" style="background:#f04438"></span>
+        <h3>AI Chatbot</h3>
+        <span class="group-count">3 งาน</span>
+      </div>
+      <div class="task-list">
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">ออกแบบ Conversation Flow</span>
+          <span class="status-pill s-progress">In Progress</span>
+          <span class="task-due">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            10 เม.ย.
+          </span>
+          <span class="task-manday">1.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check" onclick="toggleCheck(this)"></div>
+          <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name">NLP Model Research</span>
+          <span class="status-pill s-todo">Todo</span>
+          <span class="task-due">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            18 เม.ย.
+          </span>
+          <span class="task-manday">2.0d</span>
+        </div>
+        <div class="task-row">
+          <div class="task-check checked" onclick="toggleCheck(this)"></div>
+          <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+          <span class="task-name done">Project Kickoff Document</span>
+          <span class="status-pill s-done">Done</span>
+          <span class="task-due" style="color:var(--success-500)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            เสร็จแล้ว
+          </span>
+          <span class="task-manday">0.5d</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+function switchTab(el, tab) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const row = el.closest('.task-row');
+  const name = row.querySelector('.task-name');
+  if (el.classList.contains('checked')) {
+    name.classList.add('done');
+  } else {
+    name.classList.remove('done');
+  }
+}
+</script>
+</body>
+</html>
