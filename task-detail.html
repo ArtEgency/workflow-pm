@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — #1042 Responsive Layout Dashboard</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ TASK DETAIL SPECIFIC ═══ */
+.task-detail-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600; color: var(--text-tertiary);
+  text-decoration: none; margin-bottom: var(--sp-5);
+  transition: color var(--t-fast);
+}
+.task-detail-back:hover { color: var(--brand-600); }
+
+.task-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-6);
+}
+.task-detail-header-left { display: flex; align-items: center; gap: var(--sp-3); }
+.task-detail-header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+
+.task-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--sp-6);
+  align-items: flex-start;
+}
+
+/* MAIN CONTENT */
+.task-main { display: flex; flex-direction: column; gap: var(--sp-5); }
+.detail-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  animation: fadeUp 0.4s var(--ease) both;
+}
+.detail-card:nth-child(1) { animation-delay: 0.05s; }
+.detail-card:nth-child(2) { animation-delay: 0.10s; }
+.detail-card:nth-child(3) { animation-delay: 0.15s; }
+.detail-card-header {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-secondary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.detail-card-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.detail-card-body { padding: var(--sp-5); }
+
+/* DESCRIPTION */
+.task-description {
+  font-size: 14.5px; line-height: 1.7; color: var(--text-secondary);
+}
+
+/* SUBTASKS */
+.subtask-progress-bar {
+  height: 4px; background: var(--n-100); border-radius: var(--r-full);
+  margin-bottom: var(--sp-4); overflow: hidden;
+}
+.subtask-progress-fill {
+  height: 100%; border-radius: var(--r-full);
+  background: linear-gradient(90deg, var(--brand-500), var(--brand-400));
+  transition: width 0.6s var(--ease);
+}
+.subtask-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.subtask-row:last-of-type { border-bottom: none; }
+.subtask-check {
+  width: 20px; height: 20px; border-radius: var(--r-sm);
+  border: 2px solid var(--n-300); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t-fast);
+}
+.subtask-check.checked {
+  background: var(--brand-500); border-color: var(--brand-500);
+}
+.subtask-check.checked::after {
+  content: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+}
+.subtask-text { font-size: 14px; flex: 1; }
+.subtask-text.done { text-decoration: line-through; color: var(--text-tertiary); }
+.add-subtask-row {
+  display: flex; gap: var(--sp-2); margin-top: var(--sp-3);
+}
+.add-subtask-row input {
+  flex: 1; padding: 8px 12px; font-size: 13px;
+  border: 1px solid var(--border-primary); border-radius: var(--r-md);
+  font-family: var(--font-sans);
+}
+.add-subtask-row input:focus {
+  outline: none; border-color: var(--brand-500); box-shadow: var(--shadow-focus);
+}
+
+/* COMMENTS */
+.comment-tabs {
+  display: flex; border-bottom: 1px solid var(--border-secondary);
+}
+.comment-tab {
+  padding: var(--sp-3) var(--sp-5);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-tertiary);
+  cursor: pointer; border: none; background: none;
+  border-bottom: 2px solid transparent;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+}
+.comment-tab:hover { color: var(--text-primary); }
+.comment-tab.active { color: var(--brand-700); border-bottom-color: var(--brand-500); }
+.comment-list { padding: var(--sp-4) var(--sp-5); }
+.comment-item {
+  display: flex; gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.comment-item:last-child { border-bottom: none; }
+.comment-body { flex: 1; }
+.comment-meta { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: 4px; }
+.comment-author { font-size: 13px; font-weight: 600; }
+.comment-time { font-size: 12px; color: var(--text-tertiary); }
+.comment-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+.comment-input-wrap {
+  display: flex; gap: var(--sp-3); align-items: flex-start;
+  padding: var(--sp-4) var(--sp-5);
+  border-top: 1px solid var(--border-secondary);
+}
+.comment-input-wrap textarea {
+  flex: 1; padding: 10px 14px; font-size: 14px;
+  border: 1px solid var(--border-primary); border-radius: var(--r-lg);
+  resize: none; height: 40px; font-family: var(--font-sans);
+  transition: all var(--t-fast);
+}
+.comment-input-wrap textarea:focus {
+  outline: none; border-color: var(--brand-500); box-shadow: var(--shadow-focus);
+  height: 80px;
+}
+
+/* ACTIVITY */
+.activity-list { padding: var(--sp-4) var(--sp-5); display: none; }
+.activity-list.visible { display: block; }
+.activity-item {
+  display: flex; gap: var(--sp-3); padding: var(--sp-3) 0;
+  position: relative; padding-left: 28px;
+}
+.activity-item::before {
+  content: ''; position: absolute; left: 7px; top: 28px;
+  width: 2px; height: calc(100% - 16px);
+  background: var(--border-secondary);
+}
+.activity-item:last-child::before { display: none; }
+.activity-dot {
+  width: 16px; height: 16px; border-radius: var(--r-full);
+  position: absolute; left: 0; top: 14px;
+  border: 2px solid var(--surface-primary);
+}
+.activity-dot.status { background: var(--brand-500); }
+.activity-dot.assign { background: var(--success-500); }
+.activity-dot.subtask { background: var(--warning-500); }
+.activity-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.activity-text strong { color: var(--text-primary); font-weight: 600; }
+.activity-time { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* SIDEBAR */
+.task-sidebar {
+  position: sticky; top: calc(64px + var(--sp-6));
+  display: flex; flex-direction: column; gap: var(--sp-5);
+  animation: fadeUp 0.4s var(--ease) both; animation-delay: 0.15s;
+}
+.meta-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--sp-5);
+}
+.meta-card-title {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-tertiary);
+  margin-bottom: var(--sp-4);
+}
+.meta-row {
+  display: flex; align-items: center;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.meta-row:last-child { border-bottom: none; }
+.meta-label {
+  font-size: 13px; font-weight: 600; color: var(--text-tertiary);
+  min-width: 90px;
+}
+.meta-value {
+  font-size: 14px; font-weight: 500; flex: 1;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* RELATED TASKS */
+.related-task {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border-secondary);
+  cursor: pointer; transition: background var(--t-fast);
+  border-radius: var(--r-sm);
+}
+.related-task:last-child { border-bottom: none; }
+.related-task:hover { background: var(--n-50); }
+.related-task-id { font-family: var(--font-mono); font-size: 12px; color: var(--brand-600); font-weight: 600; }
+.related-task-name { font-size: 13px; flex: 1; }
+
+/* ORG SWITCHER */
+.org-switcher {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: var(--brand-50);
+  border: 1px solid var(--brand-200); border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600; color: var(--brand-700);
+  cursor: pointer; transition: all var(--t-fast); position: relative;
+}
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg>
+    </div>
+    <div class="sidebar-logo-text">Work<span>Flow</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      แดชบอร์ด
+    </a>
+    <a href="my-tasks.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      งานของฉัน
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a href="inbox.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+      กล่องข้อความ
+      <span class="sidebar-badge">3</span>
+    </a>
+    <a href="project-list.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      โปรเจค
+    </a>
+    <a href="task-board.html" class="sidebar-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      บอร์ดงาน
+    </a>
+    <a href="report.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      รายงาน
+    </a>
+    <a href="manday.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      แมนเดย์
+    </a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project" style="background:var(--brand-50);color:var(--brand-700);font-weight:600;">
+      <span class="proj-dot" style="background: #6172f3"></span>
+      Jigsaw ERP
+    </a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background: #12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background: #f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background: #f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <a href="project-settings.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      ตั้งค่า
+    </a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">สมชาย</div>
+        <div class="sidebar-user-role">Admin · Egency</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">#1042 Responsive Layout Dashboard</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <a href="project-list.html">Jigsaw ERP</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <a href="task-board.html">บอร์ดงาน</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      #1042
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-icon-btn" title="การแจ้งเตือน">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </div>
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);">
+            <div style="font-size:13px;font-weight:600;">สมชาย</div>
+            <div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div>
+          </div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- BACK LINK -->
+    <a href="task-board.html" class="task-detail-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      กลับไปบอร์ดงาน
+    </a>
+
+    <!-- HEADER -->
+    <div class="task-detail-header">
+      <div class="task-detail-header-left">
+        <span class="badge badge-brand" style="font-family:var(--font-mono);font-size:13px;">#1042</span>
+        <h1>Responsive Layout Dashboard</h1>
+      </div>
+      <div style="display:flex;gap:var(--sp-2);">
+        <button class="btn btn-ghost btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          แก้ไข
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2-COLUMN LAYOUT -->
+    <div class="task-detail-layout">
+
+      <!-- LEFT: MAIN -->
+      <div class="task-main">
+
+        <!-- DESCRIPTION CARD -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+              รายละเอียด
+            </h3>
+          </div>
+          <div class="detail-card-body">
+            <div class="task-description">
+              ปรับปรุง Dashboard ให้ Responsive รองรับหน้าจอ Tablet (768px) และ Desktop (1280px+) ทุก Component ต้องปรับขนาดได้อย่างสมบูรณ์ รวมถึง Sidebar Collapse Mode สำหรับจอเล็ก
+              <br><br>
+              <strong>Acceptance Criteria:</strong>
+              <br>• Layout ต้อง work ได้ดีบนทุก breakpoint
+              <br>• Sidebar collapse เป็น icon-only mode บน tablet
+              <br>• KPI cards ปรับจาก 4 คอลัมน์ เป็น 2 คอลัมน์ บน tablet
+              <br>• ไม่มี horizontal scroll บนทุกขนาดจอ
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTASKS CARD -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              Subtasks
+            </h3>
+            <span style="font-size:13px;color:var(--text-tertiary);font-weight:600;">3/5 เสร็จแล้ว</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="subtask-progress-bar">
+              <div class="subtask-progress-fill" style="width:60%"></div>
+            </div>
+            <div class="subtask-row">
+              <div class="subtask-check checked" onclick="toggleSubtask(this)"></div>
+              <span class="subtask-text done">สร้าง Layout Grid System</span>
+            </div>
+            <div class="subtask-row">
+              <div class="subtask-check checked" onclick="toggleSubtask(this)"></div>
+              <span class="subtask-text done">Implement Header Component</span>
+            </div>
+            <div class="subtask-row">
+              <div class="subtask-check checked" onclick="toggleSubtask(this)"></div>
+              <span class="subtask-text done">Footer Responsive</span>
+            </div>
+            <div class="subtask-row">
+              <div class="subtask-check" onclick="toggleSubtask(this)"></div>
+              <span class="subtask-text">Sidebar Collapse บน Tablet</span>
+            </div>
+            <div class="subtask-row">
+              <div class="subtask-check" onclick="toggleSubtask(this)"></div>
+              <span class="subtask-text">Test ทุก Breakpoint</span>
+            </div>
+            <div class="add-subtask-row">
+              <input type="text" placeholder="เพิ่ม subtask ใหม่...">
+              <button class="btn btn-ghost btn-sm">เพิ่ม</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMMENTS / ACTIVITY CARD -->
+        <div class="detail-card">
+          <div class="comment-tabs">
+            <button class="comment-tab active" onclick="switchCommentTab(this, 'comments')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:-2px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              ความคิดเห็น <span style="font-size:12px;color:var(--text-tertiary);font-weight:400;margin-left:2px;">3</span>
+            </button>
+            <button class="comment-tab" onclick="switchCommentTab(this, 'activity')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:-2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              กิจกรรม
+            </button>
+          </div>
+
+          <!-- COMMENTS -->
+          <div class="comment-list" id="commentsList">
+            <div class="comment-item">
+              <div class="avatar av-sm av-c3">ส</div>
+              <div class="comment-body">
+                <div class="comment-meta">
+                  <span class="comment-author">สมชาย</span>
+                  <span class="comment-time">· 2 ชม. ที่แล้ว</span>
+                </div>
+                <div class="comment-text">ขอแก้ layout ตรง sidebar อีกนิดครับ ตอน collapse มันกระตุก transition ไม่ smooth</div>
+              </div>
+            </div>
+            <div class="comment-item">
+              <div class="avatar av-sm av-c2">อ</div>
+              <div class="comment-body">
+                <div class="comment-meta">
+                  <span class="comment-author">อรัญ</span>
+                  <span class="comment-time">· 1 ชม. ที่แล้ว</span>
+                </div>
+                <div class="comment-text">รับทราบครับ จะแก้ transition ให้ smooth กว่านี้ น่าจะใช้ cubic-bezier แทน ease-in-out</div>
+              </div>
+            </div>
+            <div class="comment-item">
+              <div class="avatar av-sm av-c1">พ</div>
+              <div class="comment-body">
+                <div class="comment-meta">
+                  <span class="comment-author">พัชร</span>
+                  <span class="comment-time">· 30 นาทีที่แล้ว</span>
+                </div>
+                <div class="comment-text">API ส่วน sidebar state เสร็จแล้วนะครับ ลอง pull ดูได้เลย branch: feature/sidebar-state</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVITY -->
+          <div class="activity-list" id="activityList">
+            <div class="activity-item">
+              <div class="activity-dot status"></div>
+              <div>
+                <div class="activity-text"><strong>สมชาย</strong> เปลี่ยนสถานะจาก <span class="status-pill s-todo">To Do</span> เป็น <span class="status-pill s-progress">In Progress</span></div>
+                <div class="activity-time">3 วันที่แล้ว</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot assign"></div>
+              <div>
+                <div class="activity-text"><strong>สมชาย</strong> มอบหมายให้ <strong>อรัญ</strong></div>
+                <div class="activity-time">3 วันที่แล้ว</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot subtask"></div>
+              <div>
+                <div class="activity-text"><strong>อรัญ</strong> เพิ่ม Subtask 5 รายการ</div>
+                <div class="activity-time">2 วันที่แล้ว</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot subtask"></div>
+              <div>
+                <div class="activity-text"><strong>อรัญ</strong> ทำ Subtask "สร้าง Layout Grid System" เสร็จ</div>
+                <div class="activity-time">1 วันที่แล้ว</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMMENT INPUT -->
+          <div class="comment-input-wrap">
+            <div class="avatar av-sm av-c1">อ</div>
+            <textarea placeholder="เขียนความคิดเห็น..."></textarea>
+            <button class="btn btn-primary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /task-main -->
+
+      <!-- RIGHT: SIDEBAR -->
+      <div class="task-sidebar">
+        <div class="meta-card">
+          <div class="meta-card-title">รายละเอียดงาน</div>
+          <div class="meta-row">
+            <span class="meta-label">สถานะ</span>
+            <span class="meta-value"><span class="status-pill s-progress">In Progress</span></span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ความสำคัญ</span>
+            <span class="meta-value">
+              <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+              <span style="font-size:13px;font-weight:600;color:var(--error-700);">สูง</span>
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ผู้รับผิดชอบ</span>
+            <span class="meta-value">
+              <div class="avatar av-xs av-c2">อ</div>
+              อรัญ
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">กำหนดส่ง</span>
+            <span class="meta-value" style="color:var(--error-700);font-weight:600;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10 เม.ย. 2569
+              <span class="badge badge-error" style="font-size:11px;margin-left:4px;">เลยกำหนด</span>
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">โปรเจค</span>
+            <span class="meta-value">
+              <span class="proj-dot" style="background:#6172f3;width:8px;height:8px;border-radius:3px;"></span>
+              Jigsaw ERP
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Man-day</span>
+            <span class="meta-value" style="font-family:var(--font-mono);font-weight:700;">1.5 วัน</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">สร้างเมื่อ</span>
+            <span class="meta-value" style="color:var(--text-tertiary);">5 เม.ย. 2569</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">แท็ก</span>
+            <span class="meta-value"><span class="tag">Frontend</span> <span class="tag">UI</span></span>
+          </div>
+        </div>
+
+        <!-- RELATED TASKS -->
+        <div class="meta-card">
+          <div class="meta-card-title">งานที่เกี่ยวข้อง</div>
+          <div class="related-task" onclick="location.href='task-detail.html'">
+            <span class="related-task-id">#1040</span>
+            <span class="related-task-name">User Authentication Flow</span>
+            <span class="status-pill s-review" style="font-size:11px;">Review</span>
+          </div>
+          <div class="related-task" onclick="location.href='task-detail.html'">
+            <span class="related-task-id">#1046</span>
+            <span class="related-task-name">Implement Search Feature</span>
+            <span class="status-pill s-progress" style="font-size:11px;">In Progress</span>
+          </div>
+          <div class="related-task" onclick="location.href='task-detail.html'">
+            <span class="related-task-id">#1035</span>
+            <span class="related-task-name">สร้าง Dashboard Layout</span>
+            <span class="status-pill s-done" style="font-size:11px;">Done</span>
+          </div>
+        </div>
+      </div><!-- /task-sidebar -->
+
+    </div><!-- /task-detail-layout -->
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<script>
+function toggleOrgDropdown(e) {
+  e && e.stopPropagation();
+  document.getElementById('userDropdown').classList.remove('active');
+  document.getElementById('orgDropdown').classList.toggle('active');
+}
+function toggleUserDropdown(e) {
+  e && e.stopPropagation();
+  document.getElementById('orgDropdown').classList.remove('active');
+  document.getElementById('userDropdown').classList.toggle('active');
+}
+document.addEventListener('click', () => {
+  document.getElementById('orgDropdown').classList.remove('active');
+  document.getElementById('userDropdown').classList.remove('active');
+});
+
+/* SUBTASK TOGGLE */
+function toggleSubtask(el) {
+  el.classList.toggle('checked');
+  const text = el.nextElementSibling;
+  text.classList.toggle('done');
+  // Update progress
+  const total = document.querySelectorAll('.subtask-check').length;
+  const done = document.querySelectorAll('.subtask-check.checked').length;
+  const pct = Math.round((done / total) * 100);
+  document.querySelector('.subtask-progress-fill').style.width = pct + '%';
+  document.querySelector('.detail-card-header span[style]').textContent = done + '/' + total + ' เสร็จแล้ว';
+}
+
+/* COMMENT / ACTIVITY TAB */
+function switchCommentTab(el, tab) {
+  document.querySelectorAll('.comment-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (tab === 'comments') {
+    document.getElementById('commentsList').style.display = '';
+    document.getElementById('activityList').classList.remove('visible');
+  } else {
+    document.getElementById('commentsList').style.display = 'none';
+    document.getElementById('activityList').classList.add('visible');
+  }
+}
+</script>
+</body>
+</html>

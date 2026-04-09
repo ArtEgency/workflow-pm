@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — บอร์ดงาน</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ TASK BOARD SPECIFIC ═══ */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-5);
+}
+.page-header-left { display: flex; align-items: center; gap: var(--sp-3); }
+.page-header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.project-header-icon {
+  width: 42px; height: 42px; border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; background: var(--brand-50);
+}
+
+/* FILTER BAR */
+.board-filter-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-5); gap: var(--sp-4);
+}
+.filter-tabs { display: flex; gap: var(--sp-2); }
+.filter-tab {
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  border-radius: var(--r-full); border: 1px solid var(--border-primary);
+  background: transparent; color: var(--text-tertiary);
+  cursor: pointer; transition: all var(--t-fast); font-family: var(--font-sans);
+  display: flex; align-items: center; gap: 6px;
+}
+.filter-tab:hover { border-color: var(--n-300); color: var(--text-primary); }
+.filter-tab.active { background: var(--brand-500); color: #fff; border-color: var(--brand-500); }
+.filter-tab .tab-count {
+  font-size: 11px; font-weight: 700; padding: 1px 6px;
+  border-radius: var(--r-full); background: rgba(255,255,255,0.2);
+}
+.filter-tab:not(.active) .tab-count { background: var(--n-100); color: var(--n-600); }
+.board-search {
+  position: relative; display: flex; align-items: center;
+}
+.board-search svg {
+  position: absolute; left: 12px; width: 16px; height: 16px; color: var(--n-400);
+}
+.board-search input {
+  padding: 8px 12px 8px 36px; font-size: 14px;
+  border: 1px solid var(--border-primary); border-radius: var(--r-md);
+  background: var(--surface-secondary); color: var(--text-primary);
+  width: 220px; transition: all var(--t-fast); font-family: var(--font-sans);
+}
+.board-search input:focus {
+  outline: none; border-color: var(--brand-500);
+  box-shadow: var(--shadow-focus); background: var(--surface-primary);
+}
+
+/* KANBAN */
+.kanban-container {
+  display: flex; gap: var(--sp-4);
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: var(--sp-4);
+}
+.kanban-column {
+  width: 300px; min-width: 300px; flex-shrink: 0;
+  background: var(--surface-secondary);
+  border-radius: var(--r-xl);
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 240px);
+  animation: fadeUp 0.4s var(--ease) both;
+}
+.kanban-column:nth-child(1) { animation-delay: 0.05s; }
+.kanban-column:nth-child(2) { animation-delay: 0.10s; }
+.kanban-column:nth-child(3) { animation-delay: 0.15s; }
+.kanban-column:nth-child(4) { animation-delay: 0.20s; }
+.kanban-col-header {
+  padding: var(--sp-4); display: flex; align-items: center;
+  justify-content: space-between;
+}
+.kanban-col-title {
+  font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.col-dot {
+  width: 10px; height: 10px; border-radius: var(--r-full);
+}
+.kanban-count {
+  font-size: 12px; font-weight: 600;
+  background: var(--n-100); color: var(--n-600);
+  padding: 2px 8px; border-radius: var(--r-full);
+}
+.kanban-cards {
+  flex: 1; overflow-y: auto;
+  padding: 0 var(--sp-3) var(--sp-3);
+  display: flex; flex-direction: column; gap: var(--sp-2);
+}
+.kanban-cards::-webkit-scrollbar { width: 4px; }
+.kanban-cards::-webkit-scrollbar-thumb { background: var(--n-200); border-radius: 4px; }
+
+/* KANBAN CARD */
+.kanban-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  transition: all var(--t-med) var(--ease);
+  box-shadow: var(--shadow-xs);
+}
+.kanban-card:hover {
+  box-shadow: var(--shadow-md); border-color: var(--n-300);
+  transform: translateY(-1px);
+}
+.kanban-card-id {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--brand-600); font-weight: 600; margin-bottom: 4px;
+}
+.kanban-card-title {
+  font-size: 14px; font-weight: 600; line-height: 1.4;
+  margin-bottom: var(--sp-2); color: var(--text-primary);
+}
+.kanban-card-tags {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--sp-3);
+}
+.kanban-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: var(--sp-2); border-top: 1px solid var(--border-secondary);
+}
+.kanban-card-due {
+  font-size: 12px; color: var(--text-tertiary);
+  display: flex; align-items: center; gap: 4px;
+}
+.kanban-card-due.overdue { color: var(--error-700); font-weight: 600; }
+
+/* ADD TASK BTN */
+.add-task-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: var(--sp-3);
+  margin: 0 var(--sp-3) var(--sp-3);
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--r-lg);
+  background: transparent;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+}
+.add-task-btn:hover {
+  background: var(--brand-50); border-color: var(--brand-400);
+  color: var(--brand-600);
+}
+
+/* ORG SWITCHER */
+.org-switcher {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: var(--brand-50);
+  border: 1px solid var(--brand-200); border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600; color: var(--brand-700);
+  cursor: pointer; transition: all var(--t-fast); position: relative;
+}
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg>
+    </div>
+    <div class="sidebar-logo-text">Work<span>Flow</span></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      แดชบอร์ด
+    </a>
+    <a href="my-tasks.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      งานของฉัน
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a href="inbox.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+      กล่องข้อความ
+      <span class="sidebar-badge">3</span>
+    </a>
+    <a href="project-list.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      โปรเจค
+    </a>
+    <a href="task-board.html" class="sidebar-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      บอร์ดงาน
+    </a>
+    <a href="report.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      รายงาน
+    </a>
+    <a href="manday.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      แมนเดย์
+    </a>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project" style="background:var(--brand-50);color:var(--brand-700);font-weight:600;">
+      <span class="proj-dot" style="background: #6172f3"></span>
+      Jigsaw ERP
+    </a>
+    <a href="task-board.html" class="sidebar-project">
+      <span class="proj-dot" style="background: #12b76a"></span>
+      OTT Platform
+    </a>
+    <a href="task-board.html" class="sidebar-project">
+      <span class="proj-dot" style="background: #f79009"></span>
+      Franchise Portal
+    </a>
+    <a href="task-board.html" class="sidebar-project">
+      <span class="proj-dot" style="background: #f04438"></span>
+      AI Chatbot
+    </a>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <a href="project-settings.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      ตั้งค่า
+    </a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">สมชาย</div>
+        <div class="sidebar-user-role">Admin · Egency</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">Jigsaw ERP</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <a href="project-list.html">โปรเจค</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      บอร์ดงาน
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="ค้นหางาน...">
+      </div>
+      <div class="topbar-icon-btn" title="การแจ้งเตือน">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span>
+        Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top: 42px; right: 0; min-width: 200px;">
+          <div class="dropdown-item" style="background: var(--brand-50); color: var(--brand-700);">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span>
+            Egency
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="dropdown-item">
+            <span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span>
+            Seamless
+          </div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px; right:0; min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);">
+            <div style="font-size:13px;font-weight:600;">สมชาย</div>
+            <div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div>
+          </div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="project-header-icon">🧩</div>
+        <div>
+          <h1>Jigsaw ERP</h1>
+          <p style="font-size:13px;color:var(--text-tertiary);margin-top:1px;">Egency · 27 งาน · ความคืบหน้า 65%</p>
+        </div>
+        <span class="badge badge-success" style="margin-left:var(--sp-2);">Active</span>
+      </div>
+      <div style="display:flex;gap:var(--sp-3);">
+        <button class="btn btn-secondary btn-md">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          ตัวกรอง
+        </button>
+        <button class="btn btn-primary btn-md" onclick="openAddTaskModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงาน
+        </button>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="board-filter-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="switchTab(this)">ทั้งหมด <span class="tab-count">16</span></button>
+        <button class="filter-tab" onclick="switchTab(this)">ของฉัน <span class="tab-count">8</span></button>
+        <button class="filter-tab" onclick="switchTab(this)">เลยกำหนด <span class="tab-count">1</span></button>
+      </div>
+      <div class="board-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="ค้นหางาน...">
+      </div>
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div class="kanban-container">
+
+      <!-- TO DO -->
+      <div class="kanban-column">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="col-dot" style="background:var(--n-400)"></span> To Do</div>
+          <span class="kanban-count">6</span>
+        </div>
+        <div class="kanban-cards">
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1050</div>
+            <div class="kanban-card-title">ออกแบบ UI หน้า Login</div>
+            <div class="kanban-card-tags"><span class="tag">UI</span><span class="tag">Design</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 12 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1051</div>
+            <div class="kanban-card-title">สร้าง API Endpoint สำหรับ Users</div>
+            <div class="kanban-card-tags"><span class="tag">Backend</span><span class="tag">API</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 14 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1052</div>
+            <div class="kanban-card-title">เขียน Unit Test Module การเงิน</div>
+            <div class="kanban-card-tags"><span class="tag">Testing</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 15 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1053</div>
+            <div class="kanban-card-title">ออกแบบ Database Schema v2</div>
+            <div class="kanban-card-tags"><span class="tag">Database</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c3">ส</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 16 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1054</div>
+            <div class="kanban-card-title">Setup CI/CD Pipeline</div>
+            <div class="kanban-card-tags"><span class="tag">DevOps</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 20 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1055</div>
+            <div class="kanban-card-title">เขียน Documentation API</div>
+            <div class="kanban-card-tags"><span class="tag">Docs</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-low"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c3">ส</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 22 เม.ย.</div>
+            </div>
+          </div>
+        </div>
+        <button class="add-task-btn" onclick="openAddTaskModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงาน
+        </button>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="kanban-column">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="col-dot" style="background:var(--brand-500)"></span> In Progress</div>
+          <span class="kanban-count">4</span>
+        </div>
+        <div class="kanban-cards">
+          <div class="kanban-card" onclick="location.href='task-detail.html'" style="border-left:3px solid var(--error-500);">
+            <div class="kanban-card-id">#1042</div>
+            <div class="kanban-card-title">Responsive Layout Dashboard</div>
+            <div class="kanban-card-tags"><span class="tag">Frontend</span><span class="tag">UI</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due overdue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> เลย 2 วัน</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1043</div>
+            <div class="kanban-card-title">Integration Payment Gateway</div>
+            <div class="kanban-card-tags"><span class="tag">Backend</span><span class="tag">Payment</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 11 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1044</div>
+            <div class="kanban-card-title">แก้ Bug รายงานยอดขาย</div>
+            <div class="kanban-card-tags"><span class="tag" style="background:var(--error-50);color:var(--error-700);">Bug</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 13 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1046</div>
+            <div class="kanban-card-title">Implement Search Feature</div>
+            <div class="kanban-card-tags"><span class="tag">Frontend</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 14 เม.ย.</div>
+            </div>
+          </div>
+        </div>
+        <button class="add-task-btn" onclick="openAddTaskModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงาน
+        </button>
+      </div>
+
+      <!-- REVIEW -->
+      <div class="kanban-column">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="col-dot" style="background:#6e40c9"></span> Review</div>
+          <span class="kanban-count">2</span>
+        </div>
+        <div class="kanban-cards">
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1040</div>
+            <div class="kanban-card-title">User Authentication Flow</div>
+            <div class="kanban-card-tags"><span class="tag">Auth</span><span class="tag">Security</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-high"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 8 เม.ย.</div>
+            </div>
+          </div>
+          <div class="kanban-card" onclick="location.href='task-detail.html'">
+            <div class="kanban-card-id">#1041</div>
+            <div class="kanban-card-title">Export รายงาน PDF</div>
+            <div class="kanban-card-tags"><span class="tag">Feature</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="priority p-med"><div class="priority-bar"><span></span><span></span><span></span></div></div>
+                <div class="avatar av-xs av-c3">ส</div>
+              </div>
+              <div class="kanban-card-due"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 9 เม.ย.</div>
+            </div>
+          </div>
+        </div>
+        <button class="add-task-btn" onclick="openAddTaskModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงาน
+        </button>
+      </div>
+
+      <!-- DONE -->
+      <div class="kanban-column">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="col-dot" style="background:var(--success-500)"></span> Done</div>
+          <span class="kanban-count">4</span>
+        </div>
+        <div class="kanban-cards">
+          <div class="kanban-card" style="opacity:0.7;">
+            <div class="kanban-card-id">#1035</div>
+            <div class="kanban-card-title" style="text-decoration:line-through;color:var(--text-tertiary);">สร้าง Dashboard Layout</div>
+            <div class="kanban-card-tags"><span class="tag">Frontend</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due" style="color:var(--success-700)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> เสร็จ</div>
+            </div>
+          </div>
+          <div class="kanban-card" style="opacity:0.7;">
+            <div class="kanban-card-id">#1036</div>
+            <div class="kanban-card-title" style="text-decoration:line-through;color:var(--text-tertiary);">Setup Project Structure</div>
+            <div class="kanban-card-tags"><span class="tag">DevOps</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due" style="color:var(--success-700)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> เสร็จ</div>
+            </div>
+          </div>
+          <div class="kanban-card" style="opacity:0.7;">
+            <div class="kanban-card-id">#1037</div>
+            <div class="kanban-card-title" style="text-decoration:line-through;color:var(--text-tertiary);">Design System & Components</div>
+            <div class="kanban-card-tags"><span class="tag">Design</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar av-xs av-c2">อ</div>
+              </div>
+              <div class="kanban-card-due" style="color:var(--success-700)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> เสร็จ</div>
+            </div>
+          </div>
+          <div class="kanban-card" style="opacity:0.7;">
+            <div class="kanban-card-id">#1038</div>
+            <div class="kanban-card-title" style="text-decoration:line-through;color:var(--text-tertiary);">Database Migration Script</div>
+            <div class="kanban-card-tags"><span class="tag">Database</span></div>
+            <div class="kanban-card-footer">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar av-xs av-c1">พ</div>
+              </div>
+              <div class="kanban-card-due" style="color:var(--success-700)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> เสร็จ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /kanban-container -->
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ADD TASK MODAL -->
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <h3>เพิ่มงานใหม่</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeAddTaskModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:var(--sp-5)">
+        <div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">ชื่องาน</label>
+          <input class="input" type="text" placeholder="เช่น สร้าง API Authentication">
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">รายละเอียด</label>
+          <textarea class="input" style="height:80px;padding:10px 14px;resize:vertical" placeholder="อธิบายรายละเอียดงาน..."></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);">
+          <div>
+            <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">ผู้รับผิดชอบ</label>
+            <select class="input">
+              <option>เลือกผู้รับผิดชอบ</option>
+              <option>อรัญ</option>
+              <option>พัชร</option>
+              <option>สมชาย</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">กำหนดส่ง</label>
+            <input class="input" type="date">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);">
+          <div>
+            <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">ความสำคัญ</label>
+            <select class="input">
+              <option>ปานกลาง</option>
+              <option>สูง</option>
+              <option>ต่ำ</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">Man-day</label>
+            <input class="input" type="number" placeholder="0.0" step="0.5">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeAddTaskModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-md" onclick="closeAddTaskModal()">เพิ่มงาน</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleOrgDropdown(e) {
+  e && e.stopPropagation();
+  document.getElementById('userDropdown').classList.remove('active');
+  document.getElementById('orgDropdown').classList.toggle('active');
+}
+function toggleUserDropdown(e) {
+  e && e.stopPropagation();
+  document.getElementById('orgDropdown').classList.remove('active');
+  document.getElementById('userDropdown').classList.toggle('active');
+}
+document.addEventListener('click', () => {
+  document.getElementById('orgDropdown').classList.remove('active');
+  document.getElementById('userDropdown').classList.remove('active');
+});
+function switchTab(el) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function openAddTaskModal() { document.getElementById('addTaskModal').classList.add('active'); }
+function closeAddTaskModal() { document.getElementById('addTaskModal').classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
+});
+</script>
+</body>
+</html>
