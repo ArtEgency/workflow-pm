@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — Account</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ ACCOUNT DASHBOARD ═══ */
+.account-layout { min-height: 100vh; background: var(--surface-bg); }
+
+/* TOP NAV */
+.account-topbar {
+  height: 64px; background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--sp-8);
+  position: sticky; top: 0; z-index: 40;
+  box-shadow: var(--shadow-xs);
+}
+.account-topbar-left { display: flex; align-items: center; gap: var(--sp-5); }
+.account-logo { display: flex; align-items: center; gap: var(--sp-2); font-size: 18px; font-weight: 700; text-decoration: none; color: var(--text-primary); }
+.account-logo-mark {
+  width: 32px; height: 32px; border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  display: flex; align-items: center; justify-content: center;
+}
+.account-logo span { color: var(--brand-600); }
+.account-nav { display: flex; gap: var(--sp-1); }
+.account-nav-item {
+  padding: 8px 16px; font-size: 14px; font-weight: 600;
+  color: var(--text-tertiary); border-radius: var(--r-md);
+  text-decoration: none; transition: all var(--t-fast);
+}
+.account-nav-item:hover { background: var(--n-50); color: var(--text-primary); }
+.account-nav-item.active { background: var(--brand-50); color: var(--brand-700); }
+
+.account-topbar-right { display: flex; align-items: center; gap: var(--sp-3); }
+
+/* MAIN CONTENT */
+.account-content {
+  max-width: 960px; margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6);
+}
+.account-header {
+  margin-bottom: var(--sp-8);
+}
+.account-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+.account-header p { font-size: 15px; color: var(--text-tertiary); margin-top: 4px; }
+
+/* ORG CARDS */
+.org-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-5); margin-bottom: var(--sp-6); }
+.org-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-6);
+  box-shadow: var(--shadow-sm); cursor: pointer;
+  transition: all var(--t-med) var(--ease);
+  position: relative; overflow: hidden;
+  animation: fadeUp 0.4s var(--ease) both;
+}
+.org-card:nth-child(1) { animation-delay: 0.05s; }
+.org-card:nth-child(2) { animation-delay: 0.10s; }
+.org-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--n-300); }
+.org-card-accent {
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.org-card-top { display: flex; align-items: center; gap: var(--sp-4); margin-bottom: var(--sp-5); }
+.org-card-icon {
+  width: 52px; height: 52px; border-radius: var(--r-xl);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #fff;
+}
+.org-card-name { font-size: 20px; font-weight: 700; }
+.org-card-domain { font-size: 13px; color: var(--text-tertiary); margin-top: 2px; }
+
+.org-card-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4);
+  padding-top: var(--sp-4); border-top: 1px solid var(--border-secondary);
+}
+.org-stat { text-align: center; }
+.org-stat-value { font-size: 22px; font-weight: 700; font-family: var(--font-mono); }
+.org-stat-label { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+.org-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: var(--sp-4); padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-secondary);
+}
+.org-card-members { display: flex; align-items: center; gap: var(--sp-2); }
+.org-card-role { font-size: 12px; color: var(--text-tertiary); }
+
+/* CREATE ORG CARD */
+.create-org-card {
+  background: var(--surface-secondary); border: 2px dashed var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-8);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--sp-3); cursor: pointer; transition: all var(--t-fast);
+  text-decoration: none; color: var(--text-tertiary);
+  animation: fadeUp 0.4s var(--ease) both; animation-delay: 0.15s;
+}
+.create-org-card:hover { background: var(--brand-50); border-color: var(--brand-400); color: var(--brand-600); }
+.create-org-icon {
+  width: 52px; height: 52px; border-radius: var(--r-xl);
+  background: var(--n-100); display: flex; align-items: center; justify-content: center;
+  transition: all var(--t-fast);
+}
+.create-org-card:hover .create-org-icon { background: var(--brand-100); }
+.create-org-label { font-size: 15px; font-weight: 600; }
+
+/* RECENT ACTIVITY */
+.activity-section {
+  margin-top: var(--sp-8);
+}
+.activity-section h2 { font-size: 18px; font-weight: 700; margin-bottom: var(--sp-4); }
+.activity-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.activity-item {
+  display: flex; gap: var(--sp-3); padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background var(--t-fast);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: var(--n-50); }
+.activity-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
+.activity-text strong { color: var(--text-primary); font-weight: 600; }
+.activity-time { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; }
+.activity-org-tag {
+  font-size: 11px; font-weight: 600; padding: 1px 6px;
+  border-radius: var(--r-full); display: inline-flex; align-items: center; gap: 3px;
+}
+</style>
+</head>
+<body>
+<div class="account-layout">
+
+  <!-- TOP NAV -->
+  <div class="account-topbar">
+    <div class="account-topbar-left">
+      <a class="account-logo" href="account-dashboard.html">
+        <div class="account-logo-mark">
+          <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg>
+        </div>
+        Work<span>Flow</span>
+      </a>
+      <div class="account-nav">
+        <a href="account-dashboard.html" class="account-nav-item active">Organizations</a>
+        <a href="super-team.html" class="account-nav-item">Super Team</a>
+        <a href="profile.html" class="account-nav-item">Account Settings</a>
+      </div>
+    </div>
+    <div class="account-topbar-right">
+      <div class="topbar-icon-btn" title="การแจ้งเตือน">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div style="position:relative;" id="userWrap">
+        <div style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="toggleUserDD(event)">
+          <div class="avatar av-sm av-c1" style="border:none;">อ</div>
+          <div style="font-size:14px;font-weight:600;">สมชาย</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="dropdown" id="userDD" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);">
+            <div style="font-size:13px;font-weight:600;">สมชาย</div>
+            <div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div>
+          </div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="account-content">
+    <div class="account-header">
+      <h1>สวัสดี, สมชาย 👋</h1>
+      <p>เลือก Organization เพื่อเข้าทำงาน</p>
+    </div>
+
+    <!-- ORG GRID -->
+    <div class="org-grid">
+      <!-- Egency -->
+      <div class="org-card" onclick="location.href='dashboard.html'">
+        <div class="org-card-accent" style="background: linear-gradient(90deg, var(--brand-500), var(--brand-400));"></div>
+        <div class="org-card-top">
+          <div class="org-card-icon" style="background: linear-gradient(135deg, var(--brand-500), var(--brand-700));">E</div>
+          <div>
+            <div class="org-card-name">Egency</div>
+            <div class="org-card-domain">egency.co</div>
+          </div>
+        </div>
+        <div class="org-card-stats">
+          <div class="org-stat"><div class="org-stat-value" style="color:var(--brand-500)">3</div><div class="org-stat-label">สมาชิก</div></div>
+          <div class="org-stat"><div class="org-stat-value" style="color:var(--success-500)">4</div><div class="org-stat-label">โปรเจค</div></div>
+          <div class="org-stat"><div class="org-stat-value">1.3M</div><div class="org-stat-label">ต้นทุนรวม</div></div>
+        </div>
+        <div class="org-card-footer">
+          <div class="org-card-members">
+            <div class="avatar-group">
+              <div class="avatar av-xs av-c1">พ</div>
+              <div class="avatar av-xs av-c2">อ</div>
+              <div class="avatar av-xs av-c3">ส</div>
+            </div>
+          </div>
+          <span class="org-card-role"><span class="badge badge-brand" style="font-size:11px;">Admin</span></span>
+        </div>
+      </div>
+
+      <!-- Seamless -->
+      <div class="org-card" onclick="location.href='dashboard.html'">
+        <div class="org-card-accent" style="background: linear-gradient(90deg, #12b76a, #34d399);"></div>
+        <div class="org-card-top">
+          <div class="org-card-icon" style="background: linear-gradient(135deg, #12b76a, #059669);">S</div>
+          <div>
+            <div class="org-card-name">Seamless</div>
+            <div class="org-card-domain">seamless.dev</div>
+          </div>
+        </div>
+        <div class="org-card-stats">
+          <div class="org-stat"><div class="org-stat-value" style="color:var(--brand-500)">5</div><div class="org-stat-label">สมาชิก</div></div>
+          <div class="org-stat"><div class="org-stat-value" style="color:var(--success-500)">2</div><div class="org-stat-label">โปรเจค</div></div>
+          <div class="org-stat"><div class="org-stat-value">480K</div><div class="org-stat-label">ต้นทุนรวม</div></div>
+        </div>
+        <div class="org-card-footer">
+          <div class="org-card-members">
+            <div class="avatar-group">
+              <div class="avatar av-xs av-c4">น</div>
+              <div class="avatar av-xs av-c2">ว</div>
+              <div class="avatar av-xs av-c3">ป</div>
+            </div>
+            <span style="font-size:12px;color:var(--text-tertiary);margin-left:4px;">+2</span>
+          </div>
+          <span class="org-card-role"><span class="badge badge-success" style="font-size:11px;">Member</span></span>
+        </div>
+      </div>
+
+      <!-- Create Org -->
+      <a class="create-org-card" href="create-org.html">
+        <div class="create-org-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="create-org-label">สร้าง Organization ใหม่</div>
+      </a>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="activity-section">
+      <h2>กิจกรรมล่าสุด</h2>
+      <div class="activity-card">
+        <div class="activity-item">
+          <div class="avatar av-sm av-c2">อ</div>
+          <div class="activity-text">
+            <strong>อรัญ</strong> เปลี่ยนสถานะ <strong>#1042 Responsive Layout</strong> เป็น <span class="status-pill s-progress">In Progress</span>
+            <span class="activity-org-tag" style="background:var(--brand-50);color:var(--brand-700);margin-left:4px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--brand-500)"></span> Egency</span>
+          </div>
+          <div class="activity-time">10 นาทีที่แล้ว</div>
+        </div>
+        <div class="activity-item">
+          <div class="avatar av-sm av-c1">พ</div>
+          <div class="activity-text">
+            <strong>พัชร</strong> เพิ่มงานใหม่ <strong>#1055 Documentation API</strong>
+            <span class="activity-org-tag" style="background:var(--brand-50);color:var(--brand-700);margin-left:4px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--brand-500)"></span> Egency</span>
+          </div>
+          <div class="activity-time">30 นาทีที่แล้ว</div>
+        </div>
+        <div class="activity-item">
+          <div class="avatar av-sm av-c4">น</div>
+          <div class="activity-text">
+            <strong>นภดล</strong> ส่ง man-day log สัปดาห์นี้
+            <span class="activity-org-tag" style="background:var(--success-50);color:var(--success-700);margin-left:4px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--success-500)"></span> Seamless</span>
+          </div>
+          <div class="activity-time">1 ชม. ที่แล้ว</div>
+        </div>
+        <div class="activity-item">
+          <div class="avatar av-sm av-c3">ส</div>
+          <div class="activity-text">
+            <strong>สมชาย</strong> สร้างโปรเจคใหม่ <strong>AI Chatbot</strong>
+            <span class="activity-org-tag" style="background:var(--brand-50);color:var(--brand-700);margin-left:4px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--brand-500)"></span> Egency</span>
+          </div>
+          <div class="activity-time">2 ชม. ที่แล้ว</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleUserDD(e) {
+  e && e.stopPropagation();
+  document.getElementById('userDD').classList.toggle('active');
+}
+document.addEventListener('click', () => {
+  document.getElementById('userDD').classList.remove('active');
+});
+</script>
+</body>
+</html>
