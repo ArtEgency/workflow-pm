@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — รายงาน</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ REPORT SPECIFIC ═══ */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-6);
+}
+.page-header-left h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+.page-header-left p { font-size: 14px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* REPORT TABS */
+.report-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border-primary);
+  margin-bottom: var(--sp-6);
+}
+.report-tab {
+  padding: 12px 24px; font-size: 15px; font-weight: 500;
+  color: var(--text-tertiary); border: none; background: none;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  transition: all var(--t-fast); font-family: var(--font-sans);
+  display: flex; align-items: center; gap: 6px;
+}
+.report-tab:hover { color: var(--text-primary); }
+.report-tab.active { color: var(--brand-700); border-bottom-color: var(--brand-500); font-weight: 600; }
+
+/* TAB CONTENT */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeUp 0.3s var(--ease) both; }
+
+/* KPI CARDS */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.kpi-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-5); box-shadow: var(--shadow-sm);
+  transition: all var(--t-med) var(--ease);
+}
+.kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); }
+.kpi-icon {
+  width: 40px; height: 40px; border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.kpi-icon.brand { background: var(--brand-50); }
+.kpi-icon.success { background: var(--success-50); }
+.kpi-icon.warning { background: var(--warning-50); }
+.kpi-icon.error { background: var(--error-50); }
+.kpi-change { font-size: 13px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-full); }
+.kpi-change.up { background: var(--success-50); color: var(--success-700); }
+.kpi-change.down { background: var(--error-50); color: var(--error-700); }
+.kpi-value { font-size: 30px; font-weight: 700; font-family: var(--font-mono); letter-spacing: -1px; }
+.kpi-label { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+
+/* SECTION HEADER */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-4); margin-top: var(--sp-6);
+}
+.section-header:first-child { margin-top: 0; }
+.section-header h3 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+/* MINI PROJECT CARDS */
+.mini-project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.mini-project-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-4); box-shadow: var(--shadow-sm);
+}
+.mini-project-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); }
+.mini-project-name { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.mini-project-stats { display: flex; gap: var(--sp-4); margin-top: var(--sp-3); }
+.mini-stat { font-size: 13px; color: var(--text-tertiary); }
+.mini-stat strong { font-family: var(--font-mono); font-weight: 700; }
+
+/* REPORT TABLE */
+.report-table-wrap {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm); overflow: hidden;
+  margin-bottom: var(--sp-6);
+}
+
+/* WORKLOAD CARD */
+.workload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.workload-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-5); box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+.workload-card-name { font-size: 15px; font-weight: 700; margin-top: var(--sp-3); }
+.workload-card-role { font-size: 12px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.workload-card-stats { display: flex; justify-content: center; gap: var(--sp-5); margin-top: var(--sp-3); }
+.workload-stat-value { font-size: 20px; font-weight: 700; font-family: var(--font-mono); }
+.workload-stat-label { font-size: 11px; color: var(--text-tertiary); }
+
+/* CSS BAR CHARTS */
+.chart-section {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-5); box-shadow: var(--shadow-sm);
+  margin-bottom: var(--sp-6);
+}
+.chart-title { font-size: 15px; font-weight: 700; margin-bottom: var(--sp-5); }
+
+/* Horizontal bar chart */
+.h-bar-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.h-bar-label { font-size: 13px; font-weight: 600; min-width: 120px; text-align: right; }
+.h-bar-track { flex: 1; height: 24px; background: var(--n-100); border-radius: var(--r-sm); position: relative; overflow: hidden; }
+.h-bar-fill { height: 100%; border-radius: var(--r-sm); transition: width 0.6s var(--ease); position: absolute; left: 0; top: 0; }
+.h-bar-budget { background: var(--n-200); }
+.h-bar-cost { background: var(--brand-500); }
+.h-bar-value { font-size: 12px; font-weight: 700; font-family: var(--font-mono); min-width: 60px; }
+
+/* Vertical bar chart */
+.v-chart { display: flex; align-items: flex-end; gap: var(--sp-3); height: 160px; padding: 0 var(--sp-2); }
+.v-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.v-bar {
+  width: 100%; border-radius: var(--r-sm) var(--r-sm) 0 0;
+  transition: height 0.6s var(--ease);
+  min-height: 4px;
+}
+.v-bar-label { font-size: 11px; color: var(--text-tertiary); font-weight: 600; }
+.v-bar-value { font-size: 12px; font-weight: 700; font-family: var(--font-mono); }
+
+/* Completion rate bars */
+.completion-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.completion-label { font-size: 13px; font-weight: 600; min-width: 140px; display: flex; align-items: center; gap: 6px; }
+.completion-track { flex: 1; height: 20px; background: var(--n-100); border-radius: var(--r-sm); overflow: hidden; }
+.completion-fill { height: 100%; border-radius: var(--r-sm); transition: width 0.6s var(--ease); display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: #fff; }
+.completion-pct { font-size: 13px; font-weight: 700; font-family: var(--font-mono); min-width: 40px; text-align: right; }
+
+/* ORG SWITCHER */
+.org-switcher {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+  background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600; color: var(--brand-700);
+  cursor: pointer; transition: all var(--t-fast); position: relative;
+}
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+
+/* ANIMATIONS */
+.kpi-card { animation: fadeUp 0.4s var(--ease) both; }
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-card:nth-child(4) { animation-delay: 0.20s; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg></div>
+    <div class="sidebar-logo-text">Work<span>Flow</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
+    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
+    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
+    <a href="project-list.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> โปรเจค</a>
+    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
+    <a href="report.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
+    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่า</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">รายงาน</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      รายงาน
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="ค้นหา..."></div>
+      <div class="topbar-icon-btn" title="การแจ้งเตือน"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);"><div style="font-size:13px;font-weight:600;">สมชาย</div><div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div></div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>รายงาน</h1>
+        <p>สรุปข้อมูลโปรเจคและทีม — สัปดาห์ที่ 7-11 เม.ย. 2569</p>
+      </div>
+      <button class="btn btn-secondary btn-md">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export PDF
+      </button>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="report-tabs">
+      <button class="report-tab active" onclick="switchReportTab(this,'overview')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        ภาพรวม
+      </button>
+      <button class="report-tab" onclick="switchReportTab(this,'tasks')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        งาน
+      </button>
+      <button class="report-tab" onclick="switchReportTab(this,'people')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        คน
+      </button>
+      <button class="report-tab" onclick="switchReportTab(this,'finance')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        การเงิน
+      </button>
+      <button class="report-tab" onclick="switchReportTab(this,'trend')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Trend
+      </button>
+    </div>
+
+    <!-- ═══ TAB 1: ภาพรวม ═══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon brand">📋</div><span class="kpi-change up">+5 สัปดาห์นี้</span></div><div class="kpi-value">47</div><div class="kpi-label">Task ทั้งหมด</div></div>
+        <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon success">✅</div><span class="kpi-change up">↑ 12%</span></div><div class="kpi-value">28</div><div class="kpi-label">เสร็จแล้ว</div></div>
+        <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon error">🚨</div><span class="kpi-change down">+1</span></div><div class="kpi-value">3</div><div class="kpi-label">Overdue</div></div>
+        <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon warning">⏱️</div><span class="kpi-change up">+4.5</span></div><div class="kpi-value">38.5</div><div class="kpi-label">Man-day ใช้ไป</div></div>
+      </div>
+
+      <div class="section-header"><h3>โปรเจคทั้งหมด</h3></div>
+      <div class="mini-project-grid">
+        <div class="mini-project-card">
+          <div class="mini-project-top"><div class="mini-project-name"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</div><span class="badge badge-success">Active</span></div>
+          <div class="progress-wrap"><div class="progress-label"><span>ความคืบหน้า</span><span>65%</span></div><div class="progress-bar"><div class="progress-fill" style="width:65%;background:linear-gradient(90deg,var(--brand-500),var(--brand-400))"></div></div></div>
+          <div class="mini-project-stats"><span class="mini-stat"><strong style="color:var(--success-500)">18</strong> เสร็จ</span><span class="mini-stat"><strong style="color:var(--brand-500)">6</strong> กำลังทำ</span><span class="mini-stat"><strong style="color:var(--error-500)">3</strong> เลยกำหนด</span></div>
+        </div>
+        <div class="mini-project-card">
+          <div class="mini-project-top"><div class="mini-project-name"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</div><span class="badge badge-success">Active</span></div>
+          <div class="progress-wrap"><div class="progress-label"><span>ความคืบหน้า</span><span>42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:linear-gradient(90deg,var(--success-500),#38ef7d)"></div></div></div>
+          <div class="mini-project-stats"><span class="mini-stat"><strong style="color:var(--success-500)">10</strong> เสร็จ</span><span class="mini-stat"><strong style="color:var(--brand-500)">4</strong> กำลังทำ</span><span class="mini-stat"><strong style="color:var(--error-500)">1</strong> เลยกำหนด</span></div>
+        </div>
+        <div class="mini-project-card">
+          <div class="mini-project-top"><div class="mini-project-name"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</div><span class="badge badge-warning">Paused</span></div>
+          <div class="progress-wrap"><div class="progress-label"><span>ความคืบหน้า</span><span>28%</span></div><div class="progress-bar"><div class="progress-fill" style="width:28%;background:linear-gradient(90deg,var(--warning-500),#fbbf24)"></div></div></div>
+          <div class="mini-project-stats"><span class="mini-stat"><strong style="color:var(--success-500)">7</strong> เสร็จ</span><span class="mini-stat"><strong style="color:var(--brand-500)">2</strong> กำลังทำ</span><span class="mini-stat"><strong style="color:var(--error-500)">0</strong> เลยกำหนด</span></div>
+        </div>
+        <div class="mini-project-card">
+          <div class="mini-project-top"><div class="mini-project-name"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</div><span class="badge badge-brand">New</span></div>
+          <div class="progress-wrap"><div class="progress-label"><span>ความคืบหน้า</span><span>10%</span></div><div class="progress-bar"><div class="progress-fill" style="width:10%;background:linear-gradient(90deg,var(--error-500),#f97066)"></div></div></div>
+          <div class="mini-project-stats"><span class="mini-stat"><strong style="color:var(--success-500)">2</strong> เสร็จ</span><span class="mini-stat"><strong style="color:var(--brand-500)">3</strong> กำลังทำ</span><span class="mini-stat"><strong style="color:var(--error-500)">0</strong> เลยกำหนด</span></div>
+        </div>
+      </div>
+
+      <div class="section-header"><h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error-500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> งานเลยกำหนด</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>ผู้รับผิดชอบ</th><th>เลยกำหนด</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600);font-weight:600;">#1042</td><td>Responsive Layout Dashboard</td><td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c2">อ</div> อรัญ</div></td><td style="color:var(--error-700);font-weight:600;">2 วัน</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600);font-weight:600;">#2015</td><td>API Integration Testing</td><td><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</td><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c1">พ</div> พัชร</div></td><td style="color:var(--error-700);font-weight:600;">1 วัน</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600);font-weight:600;">#1040</td><td>User Authentication Flow</td><td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c2">อ</div> อรัญ</div></td><td style="color:var(--error-700);font-weight:600;">4 วัน</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 2: งาน ═══ -->
+    <div class="tab-panel" id="tab-tasks">
+      <div class="section-header"><h3>📅 สัปดาห์นี้ (7-11 เม.ย.)</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>กำหนด</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1042</td><td>Responsive Layout Dashboard</td><td>Jigsaw ERP</td><td>อรัญ</td><td><span class="status-pill s-progress">In Progress</span></td><td style="color:var(--error-700)">10 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1043</td><td>Integration Payment Gateway</td><td>Jigsaw ERP</td><td>พัชร</td><td><span class="status-pill s-progress">In Progress</span></td><td>11 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1044</td><td>แก้ Bug รายงานยอดขาย</td><td>Jigsaw ERP</td><td>พัชร</td><td><span class="status-pill s-progress">In Progress</span></td><td>13 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1040</td><td>User Authentication Flow</td><td>Jigsaw ERP</td><td>อรัญ</td><td><span class="status-pill s-review">Review</span></td><td>8 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1041</td><td>Export รายงาน PDF</td><td>Jigsaw ERP</td><td>สมชาย</td><td><span class="status-pill s-review">Review</span></td><td>9 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1046</td><td>Implement Search Feature</td><td>Jigsaw ERP</td><td>อรัญ</td><td><span class="status-pill s-progress">In Progress</span></td><td>14 เม.ย.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-header"><h3>📅 สัปดาห์หน้า (14-18 เม.ย.)</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>กำหนด</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1050</td><td>ออกแบบ UI หน้า Login</td><td>Jigsaw ERP</td><td>อรัญ</td><td><span class="status-pill s-todo">To Do</span></td><td>12 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1051</td><td>สร้าง API Endpoint Users</td><td>Jigsaw ERP</td><td>พัชร</td><td><span class="status-pill s-todo">To Do</span></td><td>14 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1052</td><td>Unit Test Module การเงิน</td><td>Jigsaw ERP</td><td>พัชร</td><td><span class="status-pill s-todo">To Do</span></td><td>15 เม.ย.</td></tr>
+            <tr><td style="font-family:var(--font-mono);color:var(--brand-600)">#1053</td><td>ออกแบบ Database Schema v2</td><td>Jigsaw ERP</td><td>สมชาย</td><td><span class="status-pill s-todo">To Do</span></td><td>16 เม.ย.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 3: คน ═══ -->
+    <div class="tab-panel" id="tab-people">
+      <div class="workload-grid">
+        <div class="workload-card">
+          <div class="avatar av-lg av-c2" style="margin:0 auto">อ</div>
+          <div class="workload-card-name">อรัญ</div>
+          <div class="workload-card-role">Frontend Developer</div>
+          <div class="progress-wrap"><div class="progress-label"><span>Capacity</span><span style="font-weight:700">4.0 / 5.0 วัน</span></div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:80%;background:var(--warning-500)"></div></div></div>
+          <div class="workload-card-stats">
+            <div><div class="workload-stat-value" style="color:var(--brand-500)">5</div><div class="workload-stat-label">กำลังทำ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--success-500)">8</div><div class="workload-stat-label">เสร็จ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--error-500)">1</div><div class="workload-stat-label">เลยกำหนด</div></div>
+          </div>
+        </div>
+        <div class="workload-card">
+          <div class="avatar av-lg av-c1" style="margin:0 auto">พ</div>
+          <div class="workload-card-name">พัชร</div>
+          <div class="workload-card-role">Backend Developer</div>
+          <div class="progress-wrap"><div class="progress-label"><span>Capacity</span><span style="font-weight:700">3.5 / 5.0 วัน</span></div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:70%;background:var(--brand-500)"></div></div></div>
+          <div class="workload-card-stats">
+            <div><div class="workload-stat-value" style="color:var(--brand-500)">4</div><div class="workload-stat-label">กำลังทำ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--success-500)">12</div><div class="workload-stat-label">เสร็จ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--error-500)">1</div><div class="workload-stat-label">เลยกำหนด</div></div>
+          </div>
+        </div>
+        <div class="workload-card">
+          <div class="avatar av-lg av-c3" style="margin:0 auto">ส</div>
+          <div class="workload-card-name">สมชาย</div>
+          <div class="workload-card-role">Project Manager</div>
+          <div class="progress-wrap"><div class="progress-label"><span>Capacity</span><span style="font-weight:700">2.0 / 5.0 วัน</span></div><div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:40%;background:var(--success-500)"></div></div></div>
+          <div class="workload-card-stats">
+            <div><div class="workload-stat-value" style="color:var(--brand-500)">2</div><div class="workload-stat-label">กำลังทำ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--success-500)">8</div><div class="workload-stat-label">เสร็จ</div></div>
+            <div><div class="workload-stat-value" style="color:var(--error-500)">0</div><div class="workload-stat-label">เลยกำหนด</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header"><h3>งานของทีม</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>ผู้รับผิดชอบ</th><th>ID</th><th>งาน</th><th>โปรเจค</th><th>สถานะ</th><th>Man-day</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c2">อ</div> อรัญ</div></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1042</td><td>Responsive Layout Dashboard</td><td>Jigsaw ERP</td><td><span class="status-pill s-progress">In Progress</span></td><td style="font-family:var(--font-mono)">1.5</td></tr>
+            <tr><td></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1046</td><td>Implement Search Feature</td><td>Jigsaw ERP</td><td><span class="status-pill s-progress">In Progress</span></td><td style="font-family:var(--font-mono)">1.0</td></tr>
+            <tr><td></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1050</td><td>ออกแบบ UI หน้า Login</td><td>Jigsaw ERP</td><td><span class="status-pill s-todo">To Do</span></td><td style="font-family:var(--font-mono)">1.5</td></tr>
+            <tr style="border-top:2px solid var(--border-primary)"><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c1">พ</div> พัชร</div></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1043</td><td>Integration Payment Gateway</td><td>Jigsaw ERP</td><td><span class="status-pill s-progress">In Progress</span></td><td style="font-family:var(--font-mono)">2.0</td></tr>
+            <tr><td></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1044</td><td>แก้ Bug รายงานยอดขาย</td><td>Jigsaw ERP</td><td><span class="status-pill s-progress">In Progress</span></td><td style="font-family:var(--font-mono)">0.5</td></tr>
+            <tr style="border-top:2px solid var(--border-primary)"><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c3">ส</div> สมชาย</div></td><td style="font-family:var(--font-mono);color:var(--brand-600)">#1041</td><td>Export รายงาน PDF</td><td>Jigsaw ERP</td><td><span class="status-pill s-review">Review</span></td><td style="font-family:var(--font-mono)">1.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 4: การเงิน ═══ -->
+    <div class="tab-panel" id="tab-finance">
+      <div class="chart-section">
+        <div class="chart-title">งบประมาณ vs ต้นทุน (฿)</div>
+        <div class="h-bar-row"><div class="h-bar-label">Jigsaw ERP</div><div class="h-bar-track"><div class="h-bar-fill h-bar-budget" style="width:100%"></div><div class="h-bar-fill h-bar-cost" style="width:65%"></div></div><div class="h-bar-value">780K / 1.2M</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">OTT Platform</div><div class="h-bar-track"><div class="h-bar-fill h-bar-budget" style="width:67%"></div><div class="h-bar-fill h-bar-cost" style="width:28%"></div></div><div class="h-bar-value">336K / 800K</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">Franchise Portal</div><div class="h-bar-track"><div class="h-bar-fill h-bar-budget" style="width:42%"></div><div class="h-bar-fill h-bar-cost" style="width:12%"></div></div><div class="h-bar-value">140K / 500K</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">AI Chatbot</div><div class="h-bar-track"><div class="h-bar-fill h-bar-budget" style="width:25%"></div><div class="h-bar-fill h-bar-cost" style="width:3%"></div></div><div class="h-bar-value">30K / 300K</div></div>
+      </div>
+
+      <div class="section-header"><h3>ต้นทุนต่อโปรเจค</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>โปรเจค</th><th>งบประมาณ</th><th>ใช้ไป</th><th>เหลือ</th><th>%</th></tr></thead>
+          <tbody>
+            <tr><td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td><td style="font-family:var(--font-mono)">1,200,000</td><td style="font-family:var(--font-mono);color:var(--warning-700)">780,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">420,000</td><td style="font-family:var(--font-mono);font-weight:700">65%</td></tr>
+            <tr><td><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</td><td style="font-family:var(--font-mono)">800,000</td><td style="font-family:var(--font-mono);color:var(--warning-700)">336,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">464,000</td><td style="font-family:var(--font-mono);font-weight:700">42%</td></tr>
+            <tr><td><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</td><td style="font-family:var(--font-mono)">500,000</td><td style="font-family:var(--font-mono);color:var(--warning-700)">140,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">360,000</td><td style="font-family:var(--font-mono);font-weight:700">28%</td></tr>
+            <tr><td><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</td><td style="font-family:var(--font-mono)">300,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">30,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">270,000</td><td style="font-family:var(--font-mono);font-weight:700">10%</td></tr>
+            <tr style="background:var(--surface-secondary);font-weight:700"><td>รวม</td><td style="font-family:var(--font-mono)">2,800,000</td><td style="font-family:var(--font-mono);color:var(--warning-700)">1,286,000</td><td style="font-family:var(--font-mono);color:var(--success-700)">1,514,000</td><td style="font-family:var(--font-mono)">46%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-header"><h3>ต้นทุนต่อคน</h3></div>
+      <div class="report-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>สมาชิก</th><th>Man-day</th><th>Cost (฿)</th><th>% of Total</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c2">อ</div> อรัญ</div></td><td style="font-family:var(--font-mono)">16.5</td><td style="font-family:var(--font-mono)">495,000</td><td style="font-family:var(--font-mono);font-weight:700">38%</td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c1">พ</div> พัชร</div></td><td style="font-family:var(--font-mono)">14.0</td><td style="font-family:var(--font-mono)">420,000</td><td style="font-family:var(--font-mono);font-weight:700">33%</td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:6px"><div class="avatar av-xs av-c3">ส</div> สมชาย</div></td><td style="font-family:var(--font-mono)">8.0</td><td style="font-family:var(--font-mono)">371,000</td><td style="font-family:var(--font-mono);font-weight:700">29%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 5: Trend ═══ -->
+    <div class="tab-panel" id="tab-trend">
+      <div class="chart-section">
+        <div class="chart-title">Velocity — Tasks เสร็จต่อสัปดาห์</div>
+        <div class="v-chart">
+          <div class="v-bar-col"><div class="v-bar-value">3</div><div class="v-bar" style="height:23%;background:var(--n-300)"></div><div class="v-bar-label">W1</div></div>
+          <div class="v-bar-col"><div class="v-bar-value">5</div><div class="v-bar" style="height:38%;background:var(--n-300)"></div><div class="v-bar-label">W2</div></div>
+          <div class="v-bar-col"><div class="v-bar-value">7</div><div class="v-bar" style="height:54%;background:var(--brand-400)"></div><div class="v-bar-label">W3</div></div>
+          <div class="v-bar-col"><div class="v-bar-value">4</div><div class="v-bar" style="height:31%;background:var(--brand-400)"></div><div class="v-bar-label">W4</div></div>
+          <div class="v-bar-col"><div class="v-bar-value">8</div><div class="v-bar" style="height:62%;background:var(--brand-500)"></div><div class="v-bar-label">W5</div></div>
+          <div class="v-bar-col"><div class="v-bar-value">13</div><div class="v-bar" style="height:100%;background:var(--brand-600)"></div><div class="v-bar-label">W6</div></div>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">แผน vs จริง (Man-day)</div>
+        <div style="display:flex;gap:var(--sp-4);margin-bottom:var(--sp-3);font-size:12px;color:var(--text-tertiary)"><span><span style="display:inline-block;width:12px;height:12px;background:var(--n-200);border-radius:2px;vertical-align:-2px;margin-right:4px"></span>แผน</span><span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:2px;vertical-align:-2px;margin-right:4px"></span>จริง</span></div>
+        <div class="h-bar-row"><div class="h-bar-label">Jigsaw ERP</div><div class="h-bar-track"><div class="h-bar-fill" style="width:100%;background:var(--n-200)"></div><div class="h-bar-fill" style="width:85%;background:var(--brand-500)"></div></div><div class="h-bar-value">17.0 / 20.0</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">OTT Platform</div><div class="h-bar-track"><div class="h-bar-fill" style="width:75%;background:var(--n-200)"></div><div class="h-bar-fill" style="width:55%;background:var(--brand-500)"></div></div><div class="h-bar-value">11.0 / 15.0</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">Franchise Portal</div><div class="h-bar-track"><div class="h-bar-fill" style="width:50%;background:var(--n-200)"></div><div class="h-bar-fill" style="width:30%;background:var(--warning-500)"></div></div><div class="h-bar-value">6.0 / 10.0</div></div>
+        <div class="h-bar-row"><div class="h-bar-label">AI Chatbot</div><div class="h-bar-track"><div class="h-bar-fill" style="width:25%;background:var(--n-200)"></div><div class="h-bar-fill" style="width:18%;background:var(--brand-500)"></div></div><div class="h-bar-value">3.5 / 5.0</div></div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">Completion Rate (%)</div>
+        <div class="completion-row"><div class="completion-label"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</div><div class="completion-track"><div class="completion-fill" style="width:65%;background:var(--brand-500)">65%</div></div><div class="completion-pct">65%</div></div>
+        <div class="completion-row"><div class="completion-label"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</div><div class="completion-track"><div class="completion-fill" style="width:42%;background:var(--success-500)">42%</div></div><div class="completion-pct">42%</div></div>
+        <div class="completion-row"><div class="completion-label"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</div><div class="completion-track"><div class="completion-fill" style="width:28%;background:var(--warning-500)">28%</div></div><div class="completion-pct">28%</div></div>
+        <div class="completion-row"><div class="completion-label"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</div><div class="completion-track"><div class="completion-fill" style="width:10%;background:var(--error-500)"></div></div><div class="completion-pct">10%</div></div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<script>
+function toggleOrgDropdown(e) { e&&e.stopPropagation(); document.getElementById('userDropdown').classList.remove('active'); document.getElementById('orgDropdown').classList.toggle('active'); }
+function toggleUserDropdown(e) { e&&e.stopPropagation(); document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.toggle('active'); }
+document.addEventListener('click', () => { document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.remove('active'); });
+
+function switchReportTab(el, tabId) {
+  document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+</script>
+</body>
+</html>

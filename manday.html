@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — แมนเดย์</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ MANDAY SPECIFIC ═══ */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-6);
+}
+.page-header-left h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+.page-header-left p { font-size: 14px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* WEEK SELECTOR */
+.week-selector {
+  display: flex; align-items: center; gap: var(--sp-3);
+}
+.week-btn {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  border: 1px solid var(--border-primary); background: var(--surface-primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all var(--t-fast); color: var(--text-secondary);
+}
+.week-btn:hover { background: var(--brand-50); border-color: var(--brand-300); color: var(--brand-600); }
+.week-label { font-size: 15px; font-weight: 700; min-width: 180px; text-align: center; }
+
+/* SECTION CARD */
+.section-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm);
+  overflow: hidden; margin-bottom: var(--sp-6);
+  animation: fadeUp 0.4s var(--ease) both;
+}
+.section-card:nth-child(2) { animation-delay: 0.1s; }
+.section-card-header {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-secondary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-card-header h2 {
+  font-size: 17px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-card-body { padding: 0; }
+
+/* PLAN TABLE */
+.plan-table { width: 100%; border-collapse: collapse; }
+.plan-table th {
+  text-align: left; font-size: 12px; font-weight: 600;
+  color: var(--text-tertiary); text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 10px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--surface-secondary);
+}
+.plan-table td {
+  padding: 10px 16px; font-size: 14px;
+  border-bottom: 1px solid var(--border-secondary);
+  vertical-align: middle;
+}
+.plan-table tr:hover td { background: var(--n-50); }
+.plan-input {
+  width: 100%; padding: 6px 8px; font-size: 14px;
+  border: 1px solid transparent; border-radius: var(--r-sm);
+  background: transparent; font-family: var(--font-sans);
+  transition: all var(--t-fast);
+}
+.plan-input:hover { border-color: var(--border-primary); background: var(--surface-secondary); }
+.plan-input:focus {
+  outline: none; border-color: var(--brand-500);
+  box-shadow: var(--shadow-focus); background: var(--surface-primary);
+}
+.plan-input-id {
+  width: 80px; font-family: var(--font-mono); color: var(--brand-600); font-weight: 600;
+}
+.plan-input-md {
+  width: 60px; text-align: center; font-family: var(--font-mono); font-weight: 700;
+}
+.plan-select {
+  padding: 6px 8px; font-size: 13px;
+  border: 1px solid transparent; border-radius: var(--r-sm);
+  background: transparent; font-family: var(--font-sans);
+  cursor: pointer; transition: all var(--t-fast);
+}
+.plan-select:hover { border-color: var(--border-primary); background: var(--surface-secondary); }
+.plan-select:focus { outline: none; border-color: var(--brand-500); box-shadow: var(--shadow-focus); }
+
+/* ADD ROW */
+.add-plan-row {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 2px dashed var(--border-primary);
+  font-size: 13px; font-weight: 600; color: var(--text-tertiary);
+  cursor: pointer; transition: all var(--t-fast);
+}
+.add-plan-row:hover { background: var(--brand-50); color: var(--brand-600); }
+
+/* SUMMARY ROW */
+.plan-summary {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 2px solid var(--border-primary);
+  background: var(--surface-secondary);
+  font-size: 14px; gap: var(--sp-4);
+}
+.plan-summary-label { font-weight: 600; color: var(--text-secondary); }
+.plan-summary-value { font-size: 18px; font-weight: 700; font-family: var(--font-mono); color: var(--brand-600); }
+
+/* SECTION DIVIDER */
+.section-divider {
+  height: 2px; background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  margin: var(--sp-8) 0;
+}
+
+/* MEMBER LOG SECTION */
+.member-log {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm);
+  overflow: hidden; margin-bottom: var(--sp-5);
+  animation: fadeUp 0.4s var(--ease) both;
+}
+.member-log:nth-child(1) { animation-delay: 0.05s; }
+.member-log:nth-child(2) { animation-delay: 0.10s; }
+.member-log:nth-child(3) { animation-delay: 0.15s; }
+.member-log-header {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-secondary);
+  display: flex; align-items: center; gap: var(--sp-3);
+}
+.member-log-info { flex: 1; }
+.member-log-name { font-size: 15px; font-weight: 700; }
+.member-log-role { font-size: 12px; color: var(--text-tertiary); }
+
+/* LOG TABLE */
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table th {
+  font-size: 12px; font-weight: 600; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border-primary);
+  background: var(--surface-secondary); text-align: center;
+}
+.log-table th:first-child, .log-table th:nth-child(2), .log-table th:nth-child(3) { text-align: left; }
+.log-table td {
+  padding: 8px 10px; font-size: 13px;
+  border-bottom: 1px solid var(--border-secondary);
+  text-align: center; vertical-align: middle;
+}
+.log-table td:first-child, .log-table td:nth-child(2), .log-table td:nth-child(3) { text-align: left; }
+.log-table td:first-child { font-family: var(--font-mono); color: var(--brand-600); font-weight: 600; font-size: 12px; }
+
+.day-input {
+  width: 44px; padding: 4px; text-align: center; font-size: 13px;
+  font-family: var(--font-mono); font-weight: 600;
+  border: 1px solid transparent; border-radius: var(--r-sm);
+  background: transparent; transition: all var(--t-fast);
+}
+.day-input:hover { border-color: var(--border-primary); background: var(--surface-secondary); }
+.day-input:focus {
+  outline: none; border-color: var(--brand-500);
+  box-shadow: var(--shadow-focus); background: var(--surface-primary);
+}
+
+/* TOTAL ROW */
+.log-total td {
+  font-weight: 700; font-family: var(--font-mono);
+  background: var(--surface-secondary);
+  border-top: 2px solid var(--border-primary);
+}
+
+/* CAPACITY */
+.capacity-wrap {
+  padding: var(--sp-3) var(--sp-5);
+  display: flex; align-items: center; gap: var(--sp-4);
+  border-top: 1px solid var(--border-secondary);
+}
+.capacity-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); min-width: 60px; }
+.capacity-bar { flex: 1; height: 8px; background: var(--n-100); border-radius: var(--r-full); overflow: hidden; }
+.capacity-fill { height: 100%; border-radius: var(--r-full); transition: width 0.6s var(--ease); }
+.capacity-value { font-size: 14px; font-weight: 700; font-family: var(--font-mono); min-width: 100px; text-align: right; }
+
+/* STATUS BADGE INLINE */
+.status-complete { color: var(--success-700); font-weight: 600; font-size: 13px; }
+.status-incomplete { color: var(--warning-700); font-weight: 600; font-size: 13px; }
+
+/* LOCK BUTTON */
+.lock-section {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: var(--sp-3); margin-top: var(--sp-4);
+}
+
+/* ORG SWITCHER */
+.org-switcher {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+  background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600; color: var(--brand-700);
+  cursor: pointer; transition: all var(--t-fast); position: relative;
+}
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg></div><div class="sidebar-logo-text">Work<span>Flow</span></div></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
+    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
+    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
+    <a href="project-list.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> โปรเจค</a>
+    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
+    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
+    <a href="manday.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่า</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">แมนเดย์</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      แมนเดย์
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="ค้นหา..."></div>
+      <div class="topbar-icon-btn" title="การแจ้งเตือน"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="notif-dot"></div></div>
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);"><div style="font-size:13px;font-weight:600;">สมชาย</div><div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div></div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>แมนเดย์</h1>
+        <p>วางแผนงานและบันทึก Man-day ประจำสัปดาห์</p>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION A: WORK PLAN ═══ -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          แผนงานประจำสัปดาห์
+        </h2>
+        <div class="week-selector">
+          <button class="week-btn" onclick="switchWeek('plan',-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="week-label" id="planWeekLabel">7 - 11 เม.ย. 2569</div>
+          <button class="week-btn" onclick="switchWeek('plan',1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+      <div class="section-card-body">
+        <table class="plan-table">
+          <thead>
+            <tr><th style="width:80px">Task ID</th><th>ชื่องาน</th><th style="width:130px">โปรเจค</th><th style="width:110px">ผู้รับผิดชอบ</th><th style="width:120px">กำหนดเสร็จ</th><th style="width:80px;text-align:center">Man-day</th></tr>
+          </thead>
+          <tbody id="planBody">
+            <tr>
+              <td><input class="plan-input plan-input-id" value="#1042" readonly></td>
+              <td>Responsive Layout Dashboard</td>
+              <td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td>
+              <td><select class="plan-select"><option selected>อรัญ</option><option>พัชร</option><option>สมชาย</option></select></td>
+              <td><input class="plan-input" type="date" value="2026-04-10"></td>
+              <td><input class="plan-input plan-input-md" type="number" value="1.5" step="0.5" onchange="calcPlanTotal()"></td>
+            </tr>
+            <tr>
+              <td><input class="plan-input plan-input-id" value="#1043" readonly></td>
+              <td>Integration Payment Gateway</td>
+              <td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td>
+              <td><select class="plan-select"><option>อรัญ</option><option selected>พัชร</option><option>สมชาย</option></select></td>
+              <td><input class="plan-input" type="date" value="2026-04-11"></td>
+              <td><input class="plan-input plan-input-md" type="number" value="2.0" step="0.5" onchange="calcPlanTotal()"></td>
+            </tr>
+            <tr>
+              <td><input class="plan-input plan-input-id" value="#1044" readonly></td>
+              <td>แก้ Bug รายงานยอดขาย</td>
+              <td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td>
+              <td><select class="plan-select"><option>อรัญ</option><option selected>พัชร</option><option>สมชาย</option></select></td>
+              <td><input class="plan-input" type="date" value="2026-04-09"></td>
+              <td><input class="plan-input plan-input-md" type="number" value="0.5" step="0.5" onchange="calcPlanTotal()"></td>
+            </tr>
+            <tr>
+              <td><input class="plan-input plan-input-id" value="#1046" readonly></td>
+              <td>Implement Search Feature</td>
+              <td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td>
+              <td><select class="plan-select"><option selected>อรัญ</option><option>พัชร</option><option>สมชาย</option></select></td>
+              <td><input class="plan-input" type="date" value="2026-04-14"></td>
+              <td><input class="plan-input plan-input-md" type="number" value="1.0" step="0.5" onchange="calcPlanTotal()"></td>
+            </tr>
+            <tr>
+              <td><input class="plan-input plan-input-id" value="#1050" readonly></td>
+              <td>ออกแบบ UI หน้า Login</td>
+              <td><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</td>
+              <td><select class="plan-select"><option selected>อรัญ</option><option>พัชร</option><option>สมชาย</option></select></td>
+              <td><input class="plan-input" type="date" value="2026-04-12"></td>
+              <td><input class="plan-input plan-input-md" type="number" value="1.5" step="0.5" onchange="calcPlanTotal()"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="add-plan-row" onclick="addPlanRow()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงาน
+        </div>
+        <div class="plan-summary">
+          <span class="plan-summary-label">รวม Man-day ที่วางแผน:</span>
+          <span class="plan-summary-value" id="planTotal">6.5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="section-divider"></div>
+
+    <!-- ═══ SECTION B: MAN-DAY LOG ═══ -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-5);">
+      <div style="display:flex;align-items:center;gap:var(--sp-4);">
+        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          บันทึก Man-day
+        </h2>
+        <div class="week-selector">
+          <button class="week-btn" onclick="switchWeek('log',-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="week-label" id="logWeekLabel">31 มี.ค. - 4 เม.ย. 2569</div>
+          <button class="week-btn" onclick="switchWeek('log',1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-md">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Confirm Week
+      </button>
+    </div>
+
+    <!-- MEMBER 1: อรัญ -->
+    <div class="member-log">
+      <div class="member-log-header">
+        <div class="avatar av-md av-c2">อ</div>
+        <div class="member-log-info">
+          <div class="member-log-name">อรัญ</div>
+          <div class="member-log-role">Frontend Developer</div>
+        </div>
+        <span class="status-complete">✅ ครบ</span>
+      </div>
+      <table class="log-table">
+        <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>จ.</th><th>อ.</th><th>พ.</th><th>พฤ.</th><th>ศ.</th><th>รวม</th></tr></thead>
+        <tbody>
+          <tr><td>#1035</td><td>สร้าง Dashboard Layout</td><td>Jigsaw ERP</td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="1.0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">2.0</td></tr>
+          <tr><td>#1037</td><td>Design System & Components</td><td>Jigsaw ERP</td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+          <tr><td>#1042</td><td>Responsive Layout Dashboard</td><td>Jigsaw ERP</td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+        </tbody>
+        <tfoot><tr class="log-total"><td colspan="3" style="text-align:right;padding-right:16px;">รวมต่อวัน</td><td>0.5</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0.5</td><td style="color:var(--brand-600)">4.0</td></tr></tfoot>
+      </table>
+      <div class="capacity-wrap">
+        <span class="capacity-label">Capacity</span>
+        <div class="capacity-bar"><div class="capacity-fill" style="width:80%;background:var(--brand-500)"></div></div>
+        <span class="capacity-value">4.0 / 5.0 วัน</span>
+      </div>
+    </div>
+
+    <!-- MEMBER 2: พัชร -->
+    <div class="member-log">
+      <div class="member-log-header">
+        <div class="avatar av-md av-c1">พ</div>
+        <div class="member-log-info">
+          <div class="member-log-name">พัชร</div>
+          <div class="member-log-role">Backend Developer</div>
+        </div>
+        <span class="status-incomplete">⚠️ ยังไม่ครบ</span>
+      </div>
+      <table class="log-table">
+        <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>จ.</th><th>อ.</th><th>พ.</th><th>พฤ.</th><th>ศ.</th><th>รวม</th></tr></thead>
+        <tbody>
+          <tr><td>#1036</td><td>Setup Project Structure</td><td>Jigsaw ERP</td><td><input class="day-input" value="1.0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.5</td></tr>
+          <tr><td>#1038</td><td>Database Migration Script</td><td>Jigsaw ERP</td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+          <tr><td>#1043</td><td>Integration Payment Gateway</td><td>Jigsaw ERP</td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+        </tbody>
+        <tfoot><tr class="log-total"><td colspan="3" style="text-align:right;padding-right:16px;">รวมต่อวัน</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0.5</td><td>0</td><td style="color:var(--warning-700)">3.5</td></tr></tfoot>
+      </table>
+      <div class="capacity-wrap">
+        <span class="capacity-label">Capacity</span>
+        <div class="capacity-bar"><div class="capacity-fill" style="width:70%;background:var(--warning-500)"></div></div>
+        <span class="capacity-value" style="color:var(--warning-700)">3.5 / 5.0 วัน</span>
+      </div>
+    </div>
+
+    <!-- MEMBER 3: สมชาย -->
+    <div class="member-log">
+      <div class="member-log-header">
+        <div class="avatar av-md av-c3">ส</div>
+        <div class="member-log-info">
+          <div class="member-log-name">สมชาย</div>
+          <div class="member-log-role">Project Manager</div>
+        </div>
+        <span class="status-incomplete">⚠️ ยังไม่ครบ</span>
+      </div>
+      <table class="log-table">
+        <thead><tr><th>ID</th><th>งาน</th><th>โปรเจค</th><th>จ.</th><th>อ.</th><th>พ.</th><th>พฤ.</th><th>ศ.</th><th>รวม</th></tr></thead>
+        <tbody>
+          <tr><td>#1040</td><td>User Authentication Flow</td><td>Jigsaw ERP</td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+          <tr><td>#1041</td><td>Export รายงาน PDF</td><td>Jigsaw ERP</td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0.5"></td><td><input class="day-input" value="0"></td><td style="font-weight:700;font-family:var(--font-mono)">1.0</td></tr>
+        </tbody>
+        <tfoot><tr class="log-total"><td colspan="3" style="text-align:right;padding-right:16px;">รวมต่อวัน</td><td>0.5</td><td>0.5</td><td>0.5</td><td>0.5</td><td>0</td><td style="color:var(--warning-700)">2.0</td></tr></tfoot>
+      </table>
+      <div class="capacity-wrap">
+        <span class="capacity-label">Capacity</span>
+        <div class="capacity-bar"><div class="capacity-fill" style="width:40%;background:var(--success-500)"></div></div>
+        <span class="capacity-value">2.0 / 5.0 วัน</span>
+      </div>
+    </div>
+
+    <!-- LOCK WEEK -->
+    <div class="lock-section">
+      <span style="font-size:13px;color:var(--text-tertiary);">สถานะ: <strong style="color:var(--warning-700)">ยังไม่ล็อค</strong></span>
+      <button class="btn btn-secondary btn-md">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        ล็อคสัปดาห์ (Admin)
+      </button>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<script>
+function toggleOrgDropdown(e) { e&&e.stopPropagation(); document.getElementById('userDropdown').classList.remove('active'); document.getElementById('orgDropdown').classList.toggle('active'); }
+function toggleUserDropdown(e) { e&&e.stopPropagation(); document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.toggle('active'); }
+document.addEventListener('click', () => { document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.remove('active'); });
+
+/* WEEK SWITCH (visual only) */
+const planWeeks = ['31 มี.ค. - 4 เม.ย. 2569', '7 - 11 เม.ย. 2569', '14 - 18 เม.ย. 2569'];
+const logWeeks = ['24 - 28 มี.ค. 2569', '31 มี.ค. - 4 เม.ย. 2569', '7 - 11 เม.ย. 2569'];
+let planIdx = 1, logIdx = 1;
+function switchWeek(type, dir) {
+  if (type === 'plan') {
+    planIdx = Math.max(0, Math.min(planWeeks.length - 1, planIdx + dir));
+    document.getElementById('planWeekLabel').textContent = planWeeks[planIdx];
+  } else {
+    logIdx = Math.max(0, Math.min(logWeeks.length - 1, logIdx + dir));
+    document.getElementById('logWeekLabel').textContent = logWeeks[logIdx];
+  }
+}
+
+/* CALC PLAN TOTAL */
+function calcPlanTotal() {
+  let total = 0;
+  document.querySelectorAll('.plan-input-md').forEach(inp => {
+    total += parseFloat(inp.value) || 0;
+  });
+  document.getElementById('planTotal').textContent = total.toFixed(1);
+}
+
+/* ADD PLAN ROW */
+function addPlanRow() {
+  const tbody = document.getElementById('planBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="plan-input plan-input-id" placeholder="#ID"></td>
+    <td><input class="plan-input" placeholder="ชื่องาน..."></td>
+    <td><select class="plan-select"><option>Jigsaw ERP</option><option>OTT Platform</option></select></td>
+    <td><select class="plan-select"><option>อรัญ</option><option>พัชร</option><option>สมชาย</option></select></td>
+    <td><input class="plan-input" type="date"></td>
+    <td><input class="plan-input plan-input-md" type="number" value="0" step="0.5" onchange="calcPlanTotal()"></td>
+  `;
+  tbody.appendChild(tr);
+}
+</script>
+</body>
+</html>
