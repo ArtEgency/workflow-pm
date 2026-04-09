@@ -116,46 +116,299 @@
 .org-switcher { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md); font-size: 14px; font-weight: 600; color: var(--brand-700); cursor: pointer; transition: all var(--t-fast); position: relative; }
 .org-switcher:hover { background: var(--brand-100); }
 .org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+
+/* ── WORK CALENDAR TWO-PANEL ── */
+.wc-layout { display: flex; gap: var(--sp-5); align-items: flex-start; }
+.wc-left { width: 380px; flex-shrink: 0; }
+.wc-right { flex: 1; min-width: 0; }
+
+.wd-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.wd-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 4px; border-radius: var(--r-md); cursor: pointer;
+  border: 1px solid transparent; transition: all var(--t-fast);
+  font-size: 12px; font-weight: 500; color: var(--text-secondary);
+}
+.wd-item:hover { background: var(--n-50); border-color: var(--border-primary); }
+.wd-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--brand-500); cursor: pointer; }
+.wd-item.is-checked { color: var(--brand-700); background: var(--brand-50); border-color: var(--brand-200); }
+
+.holiday-del-btn {
+  width: 24px; height: 24px; border: none; background: none; border-radius: var(--r-sm);
+  cursor: pointer; color: var(--text-tertiary); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t-fast); margin-left: auto;
+}
+.holiday-del-btn:hover { background: var(--error-50); color: var(--error-600); }
+.holiday-item { align-items: center; padding: 8px 16px; }
+.holiday-item:first-child { border-top: none; }
+
+.wc-summary-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.wc-summary-table tr td { padding: 9px 0; border-bottom: 1px solid var(--border-secondary); }
+.wc-summary-table td:last-child { text-align: right; font-family: var(--font-mono); font-weight: 700; min-width: 64px; }
+.wc-summary-table tr:last-child td { border-bottom: none; }
+.wc-summary-table tr.total-row td { color: var(--brand-700); border-top: 2px solid var(--border-primary); padding-top: 11px; font-size: 15px; }
+.wc-summary-table tr.total-row td:first-child { font-weight: 700; }
+
+.calendar-day.company { background: var(--warning-50); color: var(--warning-700); font-weight: 700; }
+.calendar-day.nonwork { color: var(--n-300); background: var(--n-50); cursor: default; }
+.calendar-day.nonwork.holiday, .calendar-day.nonwork.company, .calendar-day.nonwork.dayoff { opacity: 0.7; }
+
+.wc-right .calendar-year { grid-template-columns: repeat(3, 1fr); }
+.wc-right .calendar-month { padding: 12px; }
+.wc-right .calendar-month-title { font-size: 14px; margin-bottom: 8px; }
+.wc-right .calendar-day { font-size: 11px; padding: 4px 2px; min-height: 22px; }
+.wc-right .calendar-day-header { font-size: 10px; padding: 3px 2px; }
+
+/* Calendar legend */
+.wc-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; }
+.wc-legend-item { display: flex; align-items: center; gap: 5px; color: var(--text-secondary); }
+.wc-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* Tooltip */
+.wc-tooltip {
+  position: fixed; background: var(--n-900); color: #fff;
+  padding: 5px 10px; border-radius: var(--r-md); font-size: 12px; font-weight: 500;
+  pointer-events: none; z-index: 9999; opacity: 0; transition: opacity 0.12s;
+  white-space: nowrap; box-shadow: var(--shadow-lg);
+}
+.wc-tooltip.show { opacity: 1; }
+
+/* ── RATE SETTINGS ── */
+.rs-info-box { background:var(--brand-50);border:1px solid var(--brand-200);border-radius:var(--r-lg);padding:var(--sp-4); }
+.rs-info-table { width:100%;border-collapse:collapse;font-size:13px; }
+.rs-info-table td { padding:6px 0;border-bottom:1px solid var(--brand-100); }
+.rs-info-table tr:last-child td { border-bottom:none; }
+.rs-info-table td:last-child { text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--brand-700); }
+.rs-info-table .rs-info-total td { font-weight:700;font-size:14px; }
+
+.rs-leave-table { width:100%;border-collapse:collapse;font-size:14px; }
+.rs-leave-table td { padding:8px 0;border-bottom:1px solid var(--border-secondary);vertical-align:middle; }
+.rs-leave-table tr:last-child td { border-bottom:none; }
+.rs-leave-table td:last-child { text-align:right; }
+.rs-leave-input { width:60px;padding:5px 8px;font-size:14px;font-family:var(--font-mono);font-weight:700;border:1px solid var(--border-primary);border-radius:var(--r-sm);text-align:center;transition:all var(--t-fast); }
+.rs-leave-input:focus { outline:none;border-color:var(--brand-500);box-shadow:var(--shadow-focus); }
+.rs-net-row td { background:var(--brand-50);font-weight:700;color:var(--brand-700);padding:10px 8px; }
+
+.rs-calc-box { background:var(--n-50);border:1px solid var(--border-secondary);border-radius:var(--r-lg);padding:var(--sp-4);font-size:13px; }
+.rs-calc-row { display:flex;justify-content:space-between;padding:4px 0;color:var(--text-secondary); }
+.rs-calc-divider { border:none;border-top:1px solid var(--border-primary);margin:8px 0; }
+.rs-calc-result { font-size:18px;font-weight:800;color:var(--brand-700);font-family:var(--font-mono); }
+
+.rs-member-table { width:100%;border-collapse:collapse;font-size:13px; }
+.rs-member-table th { text-align:right;font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px;padding:10px 12px;border-bottom:1px solid var(--border-primary);background:var(--surface-secondary);white-space:nowrap; }
+.rs-member-table th:first-child,.rs-member-table th:nth-child(2),.rs-member-table th:nth-child(3) { text-align:left; }
+.rs-mr td { padding:10px 12px;border-bottom:1px solid var(--border-secondary);vertical-align:middle; }
+.rs-mr td:nth-child(n+4) { text-align:right;font-family:var(--font-mono); }
+.rs-mr:hover td { background:var(--n-50); }
+.rs-mr-detail td { padding:0 12px 12px;border-bottom:1px solid var(--border-secondary); }
+.rs-detail-box { background:var(--n-50);border-radius:var(--r-lg);padding:var(--sp-4);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4); }
+.rs-detail-field { display:flex;flex-direction:column;gap:5px; }
+.rs-detail-label { font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.4px; }
+.rs-detail-input,.rs-detail-select { padding:7px 10px;font-size:13px;border:1px solid var(--border-primary);border-radius:var(--r-sm);transition:all var(--t-fast); }
+.rs-detail-input { font-family:var(--font-mono);font-weight:600;text-align:right; }
+.rs-detail-input:focus,.rs-detail-select:focus { outline:none;border-color:var(--brand-500);box-shadow:var(--shadow-focus); }
+.rs-badge-emp { background:var(--brand-50);color:var(--brand-700);border:1px solid var(--brand-200);font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);white-space:nowrap; }
+.rs-badge-free { background:var(--warning-50);color:var(--warning-700);border:1px solid var(--warning-200);font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);white-space:nowrap; }
+.rs-edit-btn { width:28px;height:28px;border:1px solid var(--border-primary);background:white;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all var(--t-fast); }
+.rs-edit-btn:hover,.rs-edit-btn.active { border-color:var(--brand-400);color:var(--brand-700);background:var(--brand-50); }
+
+.rs-footer { background:var(--n-50);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-5);margin-top:var(--sp-5); }
+.rs-footer-row { display:flex;justify-content:space-between;font-size:13px;padding:5px 0; }
+.rs-footer-divider { border:none;border-top:1px solid var(--border-primary);margin:8px 0; }
+.rs-footer-total { font-size:17px;font-weight:800;color:var(--brand-700);font-family:var(--font-mono); }
+
+/* Tooltip on rate cell */
+.rs-tip { position:relative;display:inline-block;cursor:help;border-bottom:1px dashed var(--brand-300); }
+.rs-tip-box { visibility:hidden;opacity:0;background:var(--n-900);color:#fff;font-size:11px;font-family:var(--font-mono);padding:5px 10px;border-radius:var(--r-md);position:absolute;bottom:calc(100% + 6px);right:0;white-space:nowrap;z-index:200;transition:opacity 0.12s;pointer-events:none; }
+.rs-tip:hover .rs-tip-box { visibility:visible;opacity:1; }
 </style>
 </head>
 <body>
 <div class="app-layout">
 
 <!-- SIDEBAR (same as team.html with org-settings active) -->
-<nav class="sidebar">
-  <div class="sidebar-logo"><div class="sidebar-logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg></div><div class="sidebar-logo-text">Work<span>Flow</span></div></div>
+<nav class="sidebar" id="sidebar">
+  <!-- Org Switcher -->
+  <div class="sidebar-org" onclick="document.getElementById('orgDropdown').classList.toggle('show'); event.stopPropagation();">
+    <div class="sidebar-org-icon">E</div>
+    <div class="sidebar-org-detail">
+      <div class="sidebar-org-name">Egency</div>
+      <div class="sidebar-org-plan">Pro · 12 members</div>
+    </div>
+    <span class="sidebar-org-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </span>
+
+    <!-- Org Dropdown -->
+    <div class="sidebar-org-dropdown" id="orgDropdown">
+      <div class="sidebar-org-dropdown-item current">
+        <span class="org-dd-dot" style="background: var(--brand-600)"></span>
+        Egency
+        <svg class="org-dd-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <a href="account-dashboard.html" class="sidebar-org-dropdown-item">
+        <span class="org-dd-dot" style="background: #12b76a"></span>
+        Seamless
+      </a>
+      <div class="sidebar-org-dropdown-divider"></div>
+      <a href="account-dashboard.html" class="sidebar-org-dropdown-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        สลับ Organization
+      </a>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="sidebar-search">
+    <div class="sidebar-search-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="sidebar-search-text">ค้นหา…</span>
+      <span class="sidebar-search-kbd">⌘K</span>
+    </div>
+  </div>
+
+  <!-- Main Menu -->
   <div class="sidebar-section">
     <div class="sidebar-label">เมนูหลัก</div>
-    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
-    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
-    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
-    <a href="project-list.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> โปรเจค</a>
-    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
-    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
-    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+    <a href="dashboard.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="sidebar-text">แดชบอร์ด</span>
+    </a>
+    <a href="my-tasks.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span class="sidebar-text">งานของฉัน</span>
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a href="inbox.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+      <span class="sidebar-text">กล่องข้อความ</span>
+      <span class="sidebar-badge">3</span>
+    </a>
+    <a href="task-board.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span class="sidebar-text">บอร์ดงาน</span>
+    </a>
+    <a href="report.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      <span class="sidebar-text">รายงาน</span>
+    </a>
+    <a href="manday.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="sidebar-text">แมนเดย์</span>
+    </a>
   </div>
+
   <div class="sidebar-divider"></div>
+
+  <!-- Project Tree (collapsible) -->
   <div class="sidebar-section">
-    <div class="sidebar-label">โปรเจค — Egency</div>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+    <div class="sidebar-tree-header" id="projectTreeToggle" onclick="this.classList.toggle('collapsed')">
+      <div class="sidebar-label">โปรเจค</div>
+      <span class="sidebar-tree-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+    </div>
+    <div class="sidebar-tree-list" id="sidebarProjTree">
+      <!-- Jigsaw ERP -->
+      <div class="sb-proj" id="sbProj_jigsaw">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_jigsaw',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#6172f3"></span>
+            <span class="proj-name">Jigsaw ERP</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','Jigsaw ERP','sbProj_jigsaw')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children">
+        <div class="sb-space" id="sbSpace_uxui">
+          <div class="sb-space-row">
+            <span class="sb-chevron" onclick="sbToggle('sbSpace_uxui',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+            <svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            <span class="sb-space-name">UX/UI</span>
+            <button class="sb-add-btn" onclick="showSbPopover(event,'space','UX/UI','sbSpace_uxui')" title="เพิ่ม List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div class="sb-space-children">
+            <a href="task-board.html" class="sb-list active"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Login Screen</span></a>
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Dashboard</span></a>
+          </div>
+        </div>
+        <div class="sb-space" id="sbSpace_backend">
+          <div class="sb-space-row">
+            <span class="sb-chevron" style="transform:rotate(-90deg)" onclick="sbToggle('sbSpace_backend',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+            <svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            <span class="sb-space-name">Backend</span>
+            <button class="sb-add-btn" onclick="showSbPopover(event,'space','Backend','sbSpace_backend')" title="เพิ่ม List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div class="sb-space-children" style="display:none">
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>API Endpoints</span></a>
+          </div>
+        </div>
+        </div>
+      </div>
+      <!-- OTT Platform -->
+      <div class="sb-proj" id="sbProj_ott">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_ott',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#12b76a"></span>
+            <span class="proj-name">OTT Platform</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','OTT Platform','sbProj_ott')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Stream Tasks</span></a>
+        </div>
+      </div>
+      <!-- Franchise Portal -->
+      <div class="sb-proj" id="sbProj_franchise">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_franchise',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#f79009"></span>
+            <span class="proj-name">Franchise Portal</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','Franchise Portal','sbProj_franchise')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+        </div>
+      </div>
+      <!-- AI Chatbot -->
+      <div class="sb-proj" id="sbProj_aichatbot">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_aichatbot',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#f04438"></span>
+            <span class="proj-name">AI Chatbot</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','AI Chatbot','sbProj_aichatbot')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+        </div>
+      </div>
+    </div>
   </div>
+
   <div class="sidebar-divider"></div>
+
   <div class="sidebar-section">
-    <div class="sidebar-label">ตั้งค่า</div>
-    <a href="team.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Super Team</a>
-    <a href="org-settings.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Organization</a>
-    <a href="work-calendar.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Work Calendar</a>
-    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่าโปรเจค</a>
+    <a href="project-settings.html" class="sidebar-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="sidebar-text">ตั้งค่าโปรเจค</span>
+    </a>
   </div>
+
+  <!-- USER BOTTOM + Collapse toggle -->
   <div class="sidebar-bottom">
     <a class="sidebar-user" href="profile.html">
       <div class="avatar av-md av-c1">อ</div>
-      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">สมชาย</div>
+        <div class="sidebar-user-role">Admin · Egency</div>
+      </div>
     </a>
+    <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" title="ย่อ/ขยาย Sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19l-7-7 7-7"/><path d="M18 19l-7-7 7-7"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -172,12 +425,14 @@
     </div>
     <div class="topbar-right">
       <div class="topbar-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="ค้นหา..."></div>
-      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+      <div class="org-switcher" onclick="var d=this.querySelector('.dropdown');d.classList.toggle('active');event.stopPropagation()">
         <span class="org-dot"></span> Egency
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+        <div class="dropdown" style="top:42px;right:0;min-width:200px;">
           <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg></div>
           <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="org-settings.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Organization Settings</a>
         </div>
       </div>
       <div style="position:relative;">
@@ -258,73 +513,189 @@
 
     <!-- TAB 2: Work Calendar -->
     <div class="tab-panel" id="tab-calendar">
-      <div class="settings-card">
-        <div class="settings-card-header"><h3>📅 ปฏิทินปี 2569</h3>
-          <div style="display:flex;gap:var(--sp-3);font-size:12px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--error-50);border:1px solid var(--error-200);vertical-align:-1px;margin-right:3px;"></span>วันหยุดนักขัตฤกษ์</span>
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--warning-50);border:1px solid var(--warning-200);vertical-align:-1px;margin-right:3px;"></span>Day off</span>
-          </div>
-        </div>
-        <div class="settings-card-body">
-          <div class="calendar-year" id="calendarYear"></div>
+      <div class="wc-layout">
 
-          <div class="holiday-list">
-            <div style="font-size:14px;font-weight:700;margin-bottom:var(--sp-3);">วันหยุดที่กำหนด</div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">1 ม.ค.</div><div class="holiday-name">วันขึ้นปีใหม่</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">6 เม.ย.</div><div class="holiday-name">วันจักรี</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">13-15 เม.ย.</div><div class="holiday-name">วันสงกรานต์</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--warning-500)"></div><div class="holiday-date">16 เม.ย.</div><div class="holiday-name">ชดเชยสงกรานต์</div><span class="badge badge-warning" style="font-size:11px;">Day off</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">1 พ.ค.</div><div class="holiday-name">วันแรงงาน</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">12 ส.ค.</div><div class="holiday-name">วันแม่แห่งชาติ</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">5 ธ.ค.</div><div class="holiday-name">วันพ่อแห่งชาติ</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
-            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">31 ธ.ค.</div><div class="holiday-name">วันสิ้นปี</div><span class="badge badge-error" style="font-size:11px;">นักขัตฤกษ์</span></div>
+        <!-- ── LEFT PANEL ── -->
+        <div class="wc-left">
+
+          <!-- Working Days -->
+          <div class="settings-card" style="margin-bottom:var(--sp-4)">
+            <div class="settings-card-header">
+              <h3>📆 วันทำงาน</h3>
+              <span style="font-size:12px;color:var(--text-tertiary)" id="wdCount">5 วัน/สัปดาห์</span>
+            </div>
+            <div class="settings-card-body">
+              <div class="wd-grid" id="wdGrid">
+                <label class="wd-item is-checked"><input type="checkbox" id="wd1" checked onchange="onWdChange()"><span>จ</span></label>
+                <label class="wd-item is-checked"><input type="checkbox" id="wd2" checked onchange="onWdChange()"><span>อ</span></label>
+                <label class="wd-item is-checked"><input type="checkbox" id="wd3" checked onchange="onWdChange()"><span>พ</span></label>
+                <label class="wd-item is-checked"><input type="checkbox" id="wd4" checked onchange="onWdChange()"><span>พฤ</span></label>
+                <label class="wd-item is-checked"><input type="checkbox" id="wd5" checked onchange="onWdChange()"><span>ศ</span></label>
+                <label class="wd-item"><input type="checkbox" id="wd6" onchange="onWdChange()"><span>ส</span></label>
+                <label class="wd-item"><input type="checkbox" id="wd0" onchange="onWdChange()"><span>อา</span></label>
+              </div>
+              <div class="form-hint" style="margin-top:var(--sp-3)">เลือกวันที่นับเป็นวันทำงานปกติ</div>
+            </div>
           </div>
-        </div>
-      </div>
+
+          <!-- Holiday List -->
+          <div class="settings-card" style="margin-bottom:var(--sp-4)">
+            <div class="settings-card-header">
+              <h3>🗓️ วันหยุด <span style="font-size:12px;font-weight:400;color:var(--text-tertiary)" id="holidayCount"></span></h3>
+              <button class="btn btn-secondary btn-sm" onclick="openAddHolidayModal()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M12 5v14M5 12h14"/></svg>เพิ่มวันหยุด
+              </button>
+            </div>
+            <div style="padding:0" id="holidayList"></div>
+          </div>
+
+          <!-- Summary -->
+          <div class="settings-card">
+            <div class="settings-card-header"><h3>📊 สรุปปี 2026</h3></div>
+            <div class="settings-card-body">
+              <table class="wc-summary-table">
+                <tr><td>วันทั้งหมด</td><td>365 วัน</td></tr>
+                <tr><td>วันหยุดสุดสัปดาห์</td><td id="statWeekend">—</td></tr>
+                <tr><td style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--error-200)"></span>วันหยุดนักขัตฤกษ์</td><td id="statPublic">—</td></tr>
+                <tr><td style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--warning-200)"></span>วันหยุดบริษัท</td><td id="statCompany">—</td></tr>
+                <tr><td style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#bfdbfe"></span>Day off</td><td id="statDayoff">—</td></tr>
+                <tr class="total-row"><td>วันทำงานสุทธิ</td><td id="statWorking">—</td></tr>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /wc-left -->
+
+        <!-- ── RIGHT PANEL ── -->
+        <div class="wc-right">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h3>📅 ปฏิทิน 2026</h3>
+              <div class="wc-legend">
+                <div class="wc-legend-item"><div class="wc-legend-dot" style="background:var(--error-100);border:1px solid var(--error-300)"></div>นักขัตฤกษ์</div>
+                <div class="wc-legend-item"><div class="wc-legend-dot" style="background:var(--warning-100);border:1px solid var(--warning-300)"></div>บริษัท</div>
+                <div class="wc-legend-item"><div class="wc-legend-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div>Day off</div>
+                <div class="wc-legend-item"><div class="wc-legend-dot" style="background:var(--n-100);border:1px solid var(--n-200)"></div>หยุดสัปดาห์</div>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="calendar-year" id="calendarYear"></div>
+            </div>
+          </div>
+        </div><!-- /wc-right -->
+
+      </div><!-- /wc-layout -->
     </div>
 
     <!-- TAB 3: Rate Settings -->
     <div class="tab-panel" id="tab-rates">
-      <div class="settings-card">
-        <div class="settings-card-header"><h3>💰 Default Rate</h3></div>
+
+      <!-- S1: Work Calendar Info -->
+      <div class="settings-card" style="margin-bottom:var(--sp-4)">
+        <div class="settings-card-header">
+          <h3>📅 ข้อมูลจาก Work Calendar (ปี 2026)</h3>
+          <a href="#" onclick="switchTabByName('calendar');return false" style="font-size:12px;color:var(--brand-600);text-decoration:none">ปรับที่แท็บ Work Calendar →</a>
+        </div>
         <div class="settings-card-body">
-          <div class="form-group">
-            <label class="form-label">อัตราค่าแรงเริ่มต้น (฿ / วัน)</label>
-            <input class="rate-input" type="text" value="30,000" style="width:160px;">
-            <div class="form-hint">ใช้เป็นค่า default สำหรับสมาชิกใหม่</div>
+          <div class="rs-info-box">
+            <table class="rs-info-table">
+              <tr><td style="color:var(--text-secondary)">วันทำงาน/สัปดาห์</td><td id="rs1PerWeek">—</td></tr>
+              <tr><td style="color:var(--text-secondary)">วันทำงานรวม/ปี <span style="font-size:11px;color:var(--text-tertiary)">(ก่อนหักวันหยุด)</span></td><td id="rs1Total">—</td></tr>
+              <tr><td style="color:var(--text-secondary)">หัก วันหยุดนักขัตฤกษ์</td><td style="color:var(--error-600)" id="rs1PubHols">—</td></tr>
+              <tr class="rs-info-total"><td><strong>วันทำงานปฏิทิน/ปี</strong></td><td style="font-size:15px" id="rs1CalDays">—</td></tr>
+            </table>
           </div>
         </div>
       </div>
 
-      <div class="settings-card">
-        <div class="settings-card-header"><h3>👥 Rate ต่อสมาชิก</h3></div>
-        <table class="rate-table">
-          <thead><tr><th>สมาชิก</th><th>ตำแหน่ง</th><th style="text-align:right">Rate / วัน (฿)</th><th style="text-align:right">Man-day เดือนนี้</th><th style="text-align:right">Cost เดือนนี้ (฿)</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-sm av-c3">ส</div> สมชาย</div></td>
-              <td style="color:var(--text-tertiary)">PM</td>
-              <td style="text-align:right"><input class="rate-input" value="45,000"></td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:600">8.0</td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:700">360,000</td>
+      <!-- S2: Leave Estimate -->
+      <div class="settings-card" style="margin-bottom:var(--sp-4)">
+        <div class="settings-card-header">
+          <h3>🏖️ ประมาณการวันลา</h3>
+          <span style="font-size:12px;color:var(--text-tertiary)">ค่า Default — แก้รายคนได้ในตารางด้านล่าง</span>
+        </div>
+        <div class="settings-card-body">
+          <table class="rs-leave-table">
+            <tr><td>วันลาพักร้อน</td><td><input class="rs-leave-input" id="leaveVacation" type="number" min="0" value="6" oninput="rsRecalc()"> วัน</td></tr>
+            <tr><td>วันลาป่วย (ประมาณ)</td><td><input class="rs-leave-input" id="leaveSick" type="number" min="0" value="3" oninput="rsRecalc()"> วัน</td></tr>
+            <tr><td>วันลากิจ</td><td><input class="rs-leave-input" id="leaveBusiness" type="number" min="0" value="3" oninput="rsRecalc()"> วัน</td></tr>
+            <tr><td style="font-weight:600">รวมวันลาประมาณการ</td><td style="font-family:var(--font-mono);font-weight:700;color:var(--text-secondary)"><span id="rsTotalLeave">12</span> วัน</td></tr>
+            <tr class="rs-net-row">
+              <td>✅ วันทำงานสุทธิ/ปี</td>
+              <td style="font-family:var(--font-mono);font-size:15px"><span id="rsNetYear">—</span> วัน</td>
             </tr>
             <tr>
-              <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-sm av-c2">อ</div> อรัญ</div></td>
-              <td style="color:var(--text-tertiary)">Frontend Dev</td>
-              <td style="text-align:right"><input class="rate-input" value="30,000"></td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:600">16.5</td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:700">495,000</td>
+              <td style="color:var(--text-secondary)">วันทำงานสุทธิ/เดือน</td>
+              <td style="font-family:var(--font-mono);font-weight:600"><span id="rsNetMonth">—</span> วัน</td>
             </tr>
-            <tr>
-              <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-sm av-c1">พ</div> พัชร</div></td>
-              <td style="color:var(--text-tertiary)">Backend Dev</td>
-              <td style="text-align:right"><input class="rate-input" value="30,000"></td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:600">14.0</td>
-              <td style="text-align:right;font-family:var(--font-mono);font-weight:700">420,000</td>
-            </tr>
-          </tbody>
-        </table>
+          </table>
+        </div>
       </div>
+
+      <!-- S3: Default Rate -->
+      <div class="settings-card" style="margin-bottom:var(--sp-4)">
+        <div class="settings-card-header">
+          <h3>💰 อัตราค่าแรง Default</h3>
+          <span style="font-size:12px;color:var(--text-tertiary)">ใช้กับสมาชิกใหม่</span>
+        </div>
+        <div class="settings-card-body">
+          <div style="display:flex;align-items:flex-end;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+            <div>
+              <div class="form-label">เงินเดือนเริ่มต้น</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input class="rate-input" id="rsDefaultSalary" type="text" value="30,000" style="width:130px" oninput="rsRecalc()">
+                <span style="font-size:13px;color:var(--text-tertiary)">฿ / เดือน</span>
+              </div>
+            </div>
+          </div>
+          <div class="rs-calc-box">
+            <div class="rs-calc-row"><span>เงินเดือน × 12</span><span id="rsSalYear">360,000 ฿/ปี</span></div>
+            <div class="rs-calc-row"><span>÷ วันทำงานสุทธิ</span><span id="rsDivDays">— วัน</span></div>
+            <hr class="rs-calc-divider">
+            <div class="rs-calc-row">
+              <span style="font-weight:600;color:var(--text-primary)">=&nbsp;Rate / man-day</span>
+              <span class="rs-calc-result" id="rsDefaultRate">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4: Member Table -->
+      <div class="settings-card" style="margin-bottom:0">
+        <div class="settings-card-header">
+          <h3>👥 Rate ต่อสมาชิก</h3>
+          <span style="font-size:12px;color:var(--text-tertiary)">ดึงจาก Super Team · คลิก ✏️ เพื่อแก้รายคน</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="rs-member-table">
+            <thead><tr>
+              <th style="text-align:left">สมาชิก</th>
+              <th style="text-align:left">ตำแหน่ง</th>
+              <th style="text-align:left">ประเภท</th>
+              <th>เงินเดือน / Rate</th>
+              <th>วันลา/ปี</th>
+              <th>วันทำงานสุทธิ</th>
+              <th>Rate/man-day</th>
+              <th>Cost/เดือน</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="rsMemberTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- S5: Footer Summary -->
+      <div class="rs-footer">
+        <div style="font-size:14px;font-weight:700;margin-bottom:var(--sp-4);display:flex;align-items:center;gap:8px">📊 ประมาณการต้นทุนทีม/เดือน</div>
+        <div id="rsFooterRows"></div>
+        <hr class="rs-footer-divider">
+        <div class="rs-footer-row">
+          <span style="font-weight:700">รวม Estimate</span>
+          <span class="rs-footer-total" id="rsFooterTotal">—</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:var(--sp-2)" id="rsFooterNote"></div>
+      </div>
+
       <div class="action-bar">
         <button class="btn btn-secondary btn-md">ยกเลิก</button>
         <button class="btn btn-primary btn-md" onclick="showToast()">บันทึก</button>
@@ -333,6 +704,39 @@
 
   </div>
 </div>
+</div>
+
+<!-- ═══ ADD HOLIDAY MODAL ═══ -->
+<div class="modal-overlay" id="addHolModal" onclick="if(event.target===this)closeAddHolidayModal()">
+  <div class="tl-modal" style="width:360px" onclick="event.stopPropagation()">
+    <div class="tl-modal-header">
+      <span>เพิ่มวันหยุด</span>
+      <button class="add-sl-close" onclick="closeAddHolidayModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="tl-modal-body">
+      <div class="tl-label">วันที่</div>
+      <input class="tl-input" type="date" id="ahdDate" min="2026-01-01" max="2026-12-31" value="2026-04-01"
+        oninput="this.classList.remove('tl-input-error')">
+
+      <div class="tl-label" style="margin-top:var(--sp-4)">ชื่อวันหยุด</div>
+      <input class="tl-input" type="text" id="ahdName" placeholder="เช่น วันหยุดพิเศษ…"
+        oninput="this.classList.remove('tl-input-error')"
+        onkeydown="if(event.key==='Enter')confirmAddHoliday()">
+
+      <div class="tl-label" style="margin-top:var(--sp-4)">ประเภท</div>
+      <select class="tl-input" id="ahdType">
+        <option value="public">🔴 วันหยุดนักขัตฤกษ์</option>
+        <option value="company">🟠 วันหยุดบริษัท</option>
+        <option value="dayoff">🔵 Day off (ชดเชย)</option>
+      </select>
+    </div>
+    <div class="tl-modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeAddHolidayModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmAddHoliday()">เพิ่มวันหยุด</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">✅ บันทึกแล้ว</div>
@@ -355,38 +759,643 @@ function showToast() {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// Generate simple calendar for 2026 (Apr only as example, rest placeholder)
-function generateCalendar() {
-  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-  const holidays = {0:[1],3:[6,13,14,15,16],4:[1],7:[12],11:[5,31]};
-  const container = document.getElementById('calendarYear');
-  const dayHeaders = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+/* ── WORK CALENDAR DATA ── */
+var wcWorkDays = [1,2,3,4,5]; // Mon(1)–Fri(5); Sun=0, Sat=6
 
-  for (let m = 0; m < 12; m++) {
-    const monthDiv = document.createElement('div');
+var wcHolidays = [
+  {m:0,  d:1,  name:'วันขึ้นปีใหม่',                    type:'public'},
+  {m:2,  d:4,  name:'วันมาฆบูชา',                        type:'public'},
+  {m:3,  d:6,  name:'วันจักรี',                           type:'public'},
+  {m:3,  d:13, name:'วันสงกรานต์',                        type:'public'},
+  {m:3,  d:14, name:'วันสงกรานต์',                        type:'public'},
+  {m:3,  d:15, name:'วันสงกรานต์',                        type:'public'},
+  {m:3,  d:16, name:'ชดเชยสงกรานต์',                      type:'dayoff'},
+  {m:4,  d:1,  name:'วันแรงงานแห่งชาติ',                  type:'public'},
+  {m:4,  d:4,  name:'วันฉัตรมงคล',                        type:'public'},
+  {m:4,  d:13, name:'วันวิสาขบูชา',                       type:'public'},
+  {m:5,  d:3,  name:'วันเฉลิมฯ สมเด็จพระราชินี',          type:'public'},
+  {m:6,  d:28, name:'วันเฉลิมพระชนมพรรษา ร.10',           type:'public'},
+  {m:6,  d:29, name:'ชดเชยวันเฉลิมฯ',                     type:'dayoff'},
+  {m:7,  d:12, name:'วันแม่แห่งชาติ',                      type:'public'},
+  {m:9,  d:13, name:'วันคล้ายวันสวรรคต ร.9',               type:'public'},
+  {m:9,  d:23, name:'วันปิยมหาราช',                        type:'public'},
+  {m:10, d:2,  name:'วันหยุดพิเศษ (ชดเชย)',               type:'dayoff'},
+  {m:11, d:5,  name:'วันพ่อแห่งชาติ',                      type:'public'},
+  {m:11, d:10, name:'วันรัฐธรรมนูญ',                       type:'public'},
+  {m:11, d:31, name:'วันสิ้นปี',                           type:'public'}
+];
+
+var MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var MONTH_FULL  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                   'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+var DAY_HEADERS = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+// DOW mapping for Mon-first grid: grid col 0=Mon(1) … col 5=Sat(6) col 6=Sun(0)
+var DOW_ORDER = [1,2,3,4,5,6,0];
+
+/* build holiday lookup {m_d: {name,type}} */
+function buildHolidayMap() {
+  var map = {};
+  wcHolidays.forEach(function(h){ map[h.m+'_'+h.d] = h; });
+  return map;
+}
+
+/* ── Generate calendar ── */
+function generateCalendar() {
+  var container = document.getElementById('calendarYear');
+  if (!container) return;
+  container.innerHTML = '';
+  var hmap = buildHolidayMap();
+  var today = new Date(); // Apr 9, 2026
+
+  for (var m = 0; m < 12; m++) {
+    var monthDiv = document.createElement('div');
     monthDiv.className = 'calendar-month';
-    let html = `<div class="calendar-month-title">${months[m]}</div><div class="calendar-grid">`;
-    dayHeaders.forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
-    const firstDay = new Date(2026, m, 1).getDay();
-    const offset = firstDay === 0 ? 6 : firstDay - 1;
-    for (let i = 0; i < offset; i++) html += '<div class="calendar-day empty"></div>';
-    for (let d = 1; d <= daysInMonth[m]; d++) {
-      const dow = new Date(2026, m, d).getDay();
-      const isWeekend = dow === 0 || dow === 6;
-      const isHoliday = holidays[m] && holidays[m].includes(d);
-      let cls = 'calendar-day';
-      if (isHoliday) cls += ' holiday';
-      else if (isWeekend) cls += ' weekend';
-      if (m === 3 && d === 9) cls += ' today';
-      html += `<div class="${cls}">${d}</div>`;
+
+    var html = '<div class="calendar-month-title">' + MONTH_FULL[m] + '</div><div class="calendar-grid">';
+    DAY_HEADERS.forEach(function(d){ html += '<div class="calendar-day-header">' + d + '</div>'; });
+
+    var firstDow = new Date(2026, m, 1).getDay(); // 0=Sun
+    var offset = firstDow === 0 ? 6 : firstDow - 1; // Mon-first offset
+    for (var i = 0; i < offset; i++) html += '<div class="calendar-day empty"></div>';
+
+    var days = new Date(2026, m+1, 0).getDate();
+    for (var d = 1; d <= days; d++) {
+      var dow = new Date(2026, m, d).getDay();
+      var key = m+'_'+d;
+      var hol = hmap[key];
+      var isWork = wcWorkDays.indexOf(dow) >= 0;
+      var isToday = (2026 === today.getFullYear() && m === today.getMonth() && d === today.getDate());
+
+      var cls = 'calendar-day';
+      var tip = '';
+      if (hol) {
+        if (hol.type === 'public')  cls += ' holiday';
+        else if (hol.type === 'company') cls += ' company';
+        else if (hol.type === 'dayoff')  cls += ' dayoff';
+        tip = hol.name;
+      } else if (!isWork) {
+        cls += ' nonwork';
+      }
+      if (isToday) cls += ' today';
+
+      var attr = tip ? ' data-tip="' + tip + '"' : '';
+      html += '<div class="' + cls + '"' + attr + '>' + d + '</div>';
     }
     html += '</div>';
     monthDiv.innerHTML = html;
     container.appendChild(monthDiv);
   }
 }
-generateCalendar();
+
+/* ── Recalculate stats ── */
+function recalc() {
+  var hmap = buildHolidayMap();
+  var weekends = 0, publicH = 0, companyH = 0, dayoffH = 0, working = 0;
+
+  for (var m = 0; m < 12; m++) {
+    var days = new Date(2026, m+1, 0).getDate();
+    for (var d = 1; d <= days; d++) {
+      var dow = new Date(2026, m, d).getDay();
+      var isWork = wcWorkDays.indexOf(dow) >= 0;
+      var hol = hmap[m+'_'+d];
+      if (!isWork)                    weekends++;
+      else if (!hol)                  working++;
+      else if (hol.type==='public')   publicH++;
+      else if (hol.type==='company')  companyH++;
+      else if (hol.type==='dayoff')   dayoffH++;
+    }
+  }
+
+  document.getElementById('statWeekend').textContent  = weekends  + ' วัน';
+  document.getElementById('statPublic').textContent   = publicH   + ' วัน';
+  document.getElementById('statCompany').textContent  = companyH  + ' วัน';
+  document.getElementById('statDayoff').textContent   = dayoffH   + ' วัน';
+  document.getElementById('statWorking').textContent  = working   + ' วัน';
+  generateCalendar();
+}
+
+/* ── Working days checkboxes ── */
+function onWdChange() {
+  wcWorkDays = [];
+  [[1,'wd1'],[2,'wd2'],[3,'wd3'],[4,'wd4'],[5,'wd5'],[6,'wd6'],[0,'wd0']].forEach(function(p){
+    var el = document.getElementById(p[1]);
+    if (el) {
+      el.parentElement.classList.toggle('is-checked', el.checked);
+      if (el.checked) wcWorkDays.push(p[0]);
+    }
+  });
+  var cnt = wcWorkDays.length;
+  var el = document.getElementById('wdCount');
+  if (el) el.textContent = cnt + ' วัน/สัปดาห์';
+  recalc();
+}
+
+/* ── Holiday list render ── */
+function renderHolidayList() {
+  var list = document.getElementById('holidayList');
+  if (!list) return;
+  list.innerHTML = '';
+  wcHolidays.sort(function(a,b){ return (a.m*100+a.d) - (b.m*100+b.d); });
+
+  if (wcHolidays.length === 0) {
+    list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text-tertiary);text-align:center">ยังไม่มีวันหยุด</div>';
+  } else {
+    wcHolidays.forEach(function(h, i) {
+      var typeLabel = h.type==='public' ? 'นักขัตฤกษ์' : h.type==='company' ? 'บริษัท' : 'Day off';
+      var badgeCls  = h.type==='public' ? 'badge-error' : h.type==='company' ? 'badge-warning' : 'badge-brand';
+      var dotColor  = h.type==='public' ? 'var(--error-500)' : h.type==='company' ? 'var(--warning-500)' : 'var(--brand-500)';
+
+      var item = document.createElement('div');
+      item.className = 'holiday-item';
+      item.innerHTML =
+        '<div class="holiday-dot" style="background:'+dotColor+'"></div>' +
+        '<div class="holiday-date">'+h.d+' '+MONTH_NAMES[h.m]+'</div>' +
+        '<div class="holiday-name">'+h.name+'</div>' +
+        '<span class="badge '+badgeCls+'" style="font-size:11px;flex-shrink:0">'+typeLabel+'</span>' +
+        '<button class="holiday-del-btn" title="ลบ" data-idx="'+i+'">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+        '</button>';
+      item.querySelector('.holiday-del-btn').addEventListener('click', function(){
+        deleteHoliday(parseInt(this.dataset.idx));
+      });
+      list.appendChild(item);
+    });
+  }
+
+  var cnt = document.getElementById('holidayCount');
+  if (cnt) cnt.textContent = '(' + wcHolidays.length + ')';
+}
+
+function deleteHoliday(i) {
+  wcHolidays.splice(i, 1);
+  renderHolidayList();
+  recalc();
+}
+
+/* ── Add Holiday Modal ── */
+function openAddHolidayModal() {
+  document.getElementById('addHolModal').classList.add('active');
+  document.getElementById('ahdName').value = '';
+  document.getElementById('ahdDate').value = '';
+  document.getElementById('ahdType').value = 'public';
+  setTimeout(function(){ document.getElementById('ahdName').focus(); }, 80);
+}
+function closeAddHolidayModal() {
+  document.getElementById('addHolModal').classList.remove('active');
+}
+function confirmAddHoliday() {
+  var nameEl = document.getElementById('ahdName');
+  var dateEl = document.getElementById('ahdDate');
+  var typeEl = document.getElementById('ahdType');
+  var name = nameEl.value.trim();
+  var dateVal = dateEl.value; // YYYY-MM-DD
+  if (!name || !dateVal) {
+    if (!name) nameEl.classList.add('tl-input-error');
+    if (!dateVal) dateEl.classList.add('tl-input-error');
+    return;
+  }
+  nameEl.classList.remove('tl-input-error');
+  dateEl.classList.remove('tl-input-error');
+  var d = new Date(dateVal);
+  wcHolidays.push({ m: d.getMonth(), d: d.getDate(), name: name, type: typeEl.value });
+  closeAddHolidayModal();
+  renderHolidayList();
+  recalc();
+}
+
+/* ── Calendar tooltip ── */
+var _wcTip = null;
+function initCalendarTooltip() {
+  var tip = document.createElement('div');
+  tip.className = 'wc-tooltip'; tip.id = 'wcTip';
+  document.body.appendChild(tip);
+  _wcTip = tip;
+
+  document.getElementById('calendarYear').addEventListener('mouseover', function(e) {
+    var t = e.target.closest('[data-tip]');
+    if (!t) return;
+    tip.textContent = t.dataset.tip;
+    tip.classList.add('show');
+  });
+  document.getElementById('calendarYear').addEventListener('mousemove', function(e) {
+    if (!_wcTip.classList.contains('show')) return;
+    _wcTip.style.left = (e.clientX + 12) + 'px';
+    _wcTip.style.top  = (e.clientY - 28) + 'px';
+  });
+  document.getElementById('calendarYear').addEventListener('mouseleave', function() {
+    tip.classList.remove('show');
+  });
+  document.getElementById('calendarYear').addEventListener('mouseout', function(e) {
+    if (!e.target.closest('[data-tip]')) tip.classList.remove('show');
+  });
+}
+
+/* ── Init ── */
+renderHolidayList();
+recalc();
+// tooltip init deferred until calendar tab is opened
+document.querySelector('[onclick*="calendar"]').addEventListener('click', function() {
+  setTimeout(function(){ if (!document.getElementById('wcTip')) initCalendarTooltip(); }, 50);
+});
+</script>
+
+
+
+<!-- ═══ TASK LIST CREATION MODAL ═══ -->
+<div class="modal-overlay" id="tlModal" onclick="if(event.target===this)closeTlModal()">
+  <div class="tl-modal" onclick="event.stopPropagation()">
+    <div class="tl-modal-header">
+      <span id="tlModalTitle">สร้าง Task List</span>
+      <button class="add-sl-close" onclick="closeTlModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="tl-modal-body">
+      <div>
+        <div class="tl-label">ชื่อ Task List</div>
+        <input class="tl-input" id="tlListName" placeholder="เช่น Sprint 1, Bug Fixes, Design Tasks…" autocomplete="off" />
+      </div>
+      <div>
+        <div class="tl-label">Template</div>
+        <div class="tl-templates">
+          <div class="tl-tmpl selected" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Simple Task</div><div class="tl-tmpl-desc">To Do / In Progress / Done</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Ticket</div><div class="tl-tmpl-desc">Open / Dev / Review / Done</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Bug Report</div><div class="tl-tmpl-desc">New / In Fix / Testing / Closed</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Sprint Board</div><div class="tl-tmpl-desc">Backlog / Sprint / Done</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="tl-label">Status เริ่มต้น</div>
+        <div class="tl-status-preview">
+          <div class="tl-status-dots">
+            <span class="tl-status-dot" style="background:#94a3b8"></span>
+            <span class="tl-status-dot" style="background:#6172f3"></span>
+            <span class="tl-status-dot" style="background:#12b76a"></span>
+          </div>
+          <span>รับมาจาก Project อัตโนมัติ</span>
+          <a href="#" class="tl-status-edit" onclick="return false;">แก้ไข</a>
+        </div>
+      </div>
+    </div>
+    <div class="tl-modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeTlModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmCreateList()">สร้าง</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Sidebar tree toggle ── */
+function sbToggle(id, e) {
+  if (e) e.stopPropagation();
+  var el = document.getElementById(id); if (!el) return;
+  var children = el.querySelector(':scope > .sb-proj-children, :scope > .sb-space-children');
+  var chevron  = el.querySelector(':scope > .sb-proj-row > .sb-chevron, :scope > .sb-space-row > .sb-chevron');
+  if (!children) return;
+  var hidden = children.style.display === 'none';
+  children.style.display = hidden ? '' : 'none';
+  if (chevron) chevron.style.transform = hidden ? '' : 'rotate(-90deg)';
+}
+
+/* ── Add popover ── */
+var _sbPopoverCloseHandler = null;
+function showSbPopover(e, type, name, parentId) {
+  e.stopPropagation();
+  closeSbPopover();
+  var items = type === 'project'
+    ? [{icon:'🗂',label:'Space',desc:'แบ่งแผนกหรือหมวดงาน',act:'space'},{icon:'📋',label:'Task List',desc:'เริ่มสร้างงานได้เลย',act:'list'}]
+    : [{icon:'📋',label:'Task List',desc:'เริ่มสร้างงานได้เลย',act:'list'}];
+  var pop = document.createElement('div');
+  pop.className = 'sb-add-popover'; pop.id = 'sbPopover';
+  var titleEl = document.createElement('div');
+  titleEl.className = 'sb-popover-title'; titleEl.textContent = 'เพิ่มใน ' + name;
+  pop.appendChild(titleEl);
+  items.forEach(function(item) {
+    var row = document.createElement('div');
+    row.className = 'sb-popover-item';
+    row.innerHTML = '<span class="sb-popover-icon">' + item.icon + '</span><div><div class="sb-popover-label">' + item.label + '</div><div class="sb-popover-desc">' + item.desc + '</div></div>';
+    row.onclick = function() {
+      closeSbPopover();
+      if (item.act === 'space') startAddSpace(parentId);
+      else openTlModal(name, parentId);
+    };
+    pop.appendChild(row);
+  });
+  document.body.appendChild(pop);
+  var r = e.currentTarget.getBoundingClientRect();
+  var pw = 220; var left = r.right + 8;
+  if (left + pw > window.innerWidth - 8) left = r.left - pw - 4;
+  pop.style.left = Math.max(8, left) + 'px';
+  pop.style.top  = Math.max(8, r.top - 4) + 'px';
+  setTimeout(function() {
+    _sbPopoverCloseHandler = function(ev) { if (!pop.contains(ev.target)) closeSbPopover(); };
+    document.addEventListener('click', _sbPopoverCloseHandler);
+  }, 0);
+}
+function closeSbPopover() {
+  if (_sbPopoverCloseHandler) { document.removeEventListener('click', _sbPopoverCloseHandler); _sbPopoverCloseHandler = null; }
+  var p = document.getElementById('sbPopover'); if (p) p.remove();
+}
+
+/* ── Inline space creation ── */
+function startAddSpace(parentId) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-proj-children'); if (!children) return;
+  children.style.display = '';
+  var chevron = parent.querySelector(':scope > .sb-proj-row > .sb-chevron');
+  if (chevron) chevron.style.transform = '';
+  var row = document.createElement('div');
+  row.className = 'sb-inline-row';
+  row.innerHTML = '<svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><input class="sb-inline-input" placeholder="ชื่อ Space\u2026" />';
+  children.appendChild(row);
+  var inp = row.querySelector('input'); inp.focus();
+  inp.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Enter') { ev.preventDefault(); var n = inp.value.trim(); if (n) { row.remove(); createSpace(parentId, n); } }
+    else if (ev.key === 'Escape') { row.remove(); }
+  });
+  inp.addEventListener('blur', function() { setTimeout(function() { if (row.parentNode) row.remove(); }, 200); });
+}
+
+function createSpace(parentId, name) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-proj-children'); if (!children) return;
+  var sid = 'sbSpace_' + Date.now();
+  /* Build with DOM to avoid quote-escaping hell */
+  var spaceEl = document.createElement('div');
+  spaceEl.className = 'sb-space'; spaceEl.id = sid;
+
+  var row = document.createElement('div'); row.className = 'sb-space-row';
+
+  var chev = document.createElement('span'); chev.className = 'sb-chevron';
+  chev.style.transform = 'rotate(-90deg)';
+  chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  (function(id){ chev.addEventListener('click', function(e){ sbToggle(id, e); }); })(sid);
+
+  var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('class','sb-space-icon'); icon.setAttribute('viewBox','0 0 24 24');
+  icon.setAttribute('fill','none'); icon.setAttribute('stroke','currentColor');
+  icon.setAttribute('stroke-width','1.8'); icon.setAttribute('stroke-linecap','round'); icon.setAttribute('stroke-linejoin','round');
+  var pathEl = document.createElementNS('http://www.w3.org/2000/svg','path');
+  pathEl.setAttribute('d','M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z');
+  icon.appendChild(pathEl);
+
+  var nameEl = document.createElement('span'); nameEl.className = 'sb-space-name'; nameEl.textContent = name;
+
+  var addBtn = document.createElement('button'); addBtn.className = 'sb-add-btn'; addBtn.title = 'เพิ่ม List';
+  addBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+  (function(n, id){ addBtn.addEventListener('click', function(e){ showSbPopover(e,'space',n,id); }); })(name, sid);
+
+  row.appendChild(chev); row.appendChild(icon); row.appendChild(nameEl); row.appendChild(addBtn);
+
+  var spaceChildren = document.createElement('div');
+  spaceChildren.className = 'sb-space-children'; spaceChildren.style.display = 'none';
+
+  spaceEl.appendChild(row); spaceEl.appendChild(spaceChildren);
+  children.appendChild(spaceEl);
+  spaceEl.classList.add('sb-new-highlight');
+  setTimeout(function(){ spaceEl.classList.remove('sb-new-highlight'); }, 1500);
+}
+
+/* ── Task List modal ── */
+var _tlParentId = null;
+function openTlModal(name, parentId) {
+  _tlParentId = parentId;
+  var overlay = document.getElementById('tlModal'); if (!overlay) return;
+  document.getElementById('tlModalTitle').textContent = 'เพิ่มใน ' + name;
+  document.getElementById('tlListName').value = '';
+  overlay.querySelectorAll('.tl-tmpl').forEach(function(t){ t.classList.remove('selected'); });
+  var first = overlay.querySelector('.tl-tmpl'); if (first) first.classList.add('selected');
+  overlay.classList.add('active');
+  setTimeout(function(){ document.getElementById('tlListName').focus(); }, 100);
+}
+function closeTlModal() {
+  var o = document.getElementById('tlModal'); if (o) o.classList.remove('active');
+}
+function selectTlTmpl(el) {
+  el.closest('.tl-templates').querySelectorAll('.tl-tmpl').forEach(function(t){ t.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function confirmCreateList() {
+  var inp = document.getElementById('tlListName');
+  var name = (inp.value || '').trim();
+  if (!name) { inp.focus(); inp.classList.add('tl-input-error'); return; }
+  inp.classList.remove('tl-input-error');
+  var pid = _tlParentId; closeTlModal();
+  addListToSidebar(pid, name);
+}
+function addListToSidebar(parentId, name) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-space-children, :scope > .sb-proj-children'); if (!children) return;
+  children.style.display = '';
+  var chevron = parent.querySelector(':scope > .sb-proj-row > .sb-chevron, :scope > .sb-space-row > .sb-chevron');
+  if (chevron) chevron.style.transform = '';
+  document.querySelectorAll('.sb-list.active').forEach(function(l){ l.classList.remove('active'); });
+  var el = document.createElement('a');
+  el.className = 'sb-list active'; el.href = 'task-board.html';
+  el.innerHTML = '<svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>' + name + '</span>';
+  children.appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ═══════════════════════════════════════
+   RATE SETTINGS
+   ═══════════════════════════════════════ */
+var rsMembers = [
+  { id:1, name:'สมชาย', avCls:'av-c3', ini:'ส', role:'PM',           type:'freelance', salary:0,     directRate:3500, leaveOvr:null },
+  { id:2, name:'อรัญ',  avCls:'av-c2', ini:'อ', role:'Frontend Dev', type:'employee',  salary:30000, directRate:null, leaveOvr:null },
+  { id:3, name:'พัชร',  avCls:'av-c1', ini:'พ', role:'Backend Dev',  type:'employee',  salary:30000, directRate:null, leaveOvr:null }
+];
+
+function rsGetCalStats() {
+  var total=0, pub=0;
+  var hmap = buildHolidayMap();
+  for (var m=0; m<12; m++) {
+    var days = new Date(2026,m+1,0).getDate();
+    for (var d=1; d<=days; d++) {
+      var dow = new Date(2026,m,d).getDay();
+      if (wcWorkDays.indexOf(dow)<0) continue;
+      total++;
+      var h = hmap[m+'_'+d];
+      if (h && h.type==='public') pub++;
+    }
+  }
+  return { perWeek:wcWorkDays.length, total:total, pub:pub, cal:total-pub };
+}
+
+function rsParseSalary(s) { return parseInt((s+'').replace(/,/g,''))||0; }
+
+function rsFmt(n) {
+  if (!isFinite(n)) return '—';
+  return n.toLocaleString('th-TH',{maximumFractionDigits:0});
+}
+
+function rsGetDefaultLeave() {
+  var v = parseInt((document.getElementById('leaveVacation')||{}).value)||0;
+  var s = parseInt((document.getElementById('leaveSick')||{}).value)||0;
+  var b = parseInt((document.getElementById('leaveBusiness')||{}).value)||0;
+  return v+s+b;
+}
+
+function rsGetNetYear(calDays, leaveOvr) {
+  var leave = (leaveOvr !== null && leaveOvr !== undefined) ? leaveOvr : rsGetDefaultLeave();
+  return calDays - leave;
+}
+
+function rsRecalc() {
+  var st = rsGetCalStats();
+
+  /* S1 */
+  var e = document.getElementById('rs1PerWeek');  if(e) e.textContent = st.perWeek+' วัน';
+  e = document.getElementById('rs1Total');        if(e) e.textContent = st.total+' วัน';
+  e = document.getElementById('rs1PubHols');      if(e) e.textContent = st.pub+' วัน';
+  e = document.getElementById('rs1CalDays');      if(e) e.textContent = st.cal+' วัน';
+
+  /* S2 */
+  var totalLeave = rsGetDefaultLeave();
+  var netYear  = st.cal - totalLeave;
+  var netMonth = netYear / 12;
+  e = document.getElementById('rsTotalLeave'); if(e) e.textContent = totalLeave;
+  e = document.getElementById('rsNetYear');    if(e) e.textContent = netYear;
+  e = document.getElementById('rsNetMonth');   if(e) e.textContent = netMonth.toFixed(1);
+
+  /* S3 */
+  var salStr  = (document.getElementById('rsDefaultSalary')||{}).value||'30000';
+  var sal     = rsParseSalary(salStr);
+  var salYear = sal * 12;
+  var defRate = netYear>0 ? Math.round(salYear/netYear) : 0;
+  e = document.getElementById('rsSalYear');    if(e) e.textContent = rsFmt(salYear)+' ฿/ปี';
+  e = document.getElementById('rsDivDays');    if(e) e.textContent = netYear+' วัน';
+  e = document.getElementById('rsDefaultRate');if(e) e.textContent = rsFmt(defRate)+' ฿';
+
+  /* S4 */
+  rsRenderMembers(st);
+}
+
+function rsRenderMembers(st) {
+  var tbody = document.getElementById('rsMemberTbody');
+  if (!tbody) return;
+
+  /* preserve expand state */
+  var expanded = {};
+  tbody.querySelectorAll('tr.rs-mr-detail').forEach(function(r){
+    if (r.style.display !== 'none') expanded[r.dataset.id] = true;
+  });
+
+  var salStr = (document.getElementById('rsDefaultSalary')||{}).value||'30000';
+  var defSal = rsParseSalary(salStr);
+
+  tbody.innerHTML = '';
+  var empTotal = 0, freelancerNames = [];
+  var footerHTML = '';
+
+  rsMembers.forEach(function(m) {
+    var leave = (m.leaveOvr !== null && m.leaveOvr !== undefined) ? m.leaveOvr : rsGetDefaultLeave();
+    var netY  = st.cal - leave;
+    var sal   = m.type==='employee' ? (m.salary||defSal) : 0;
+
+    var rate, costStr, salDisplay, tipText;
+    if (m.type==='employee') {
+      rate       = netY>0 ? Math.round(sal*12/netY) : 0;
+      var costMo = Math.round(rate*(netY/12));
+      costStr    = rsFmt(costMo)+' ฿';
+      salDisplay = rsFmt(sal);
+      tipText    = rsFmt(sal)+' × 12 ÷ '+netY+' วัน = '+rsFmt(rate)+' ฿';
+      empTotal  += costMo;
+      footerHTML += '<div class="rs-footer-row"><span>'+m.name+'</span><span style="font-family:var(--font-mono);font-weight:600">'+rsFmt(costMo)+' ฿</span></div>';
+    } else {
+      rate       = m.directRate||0;
+      costStr    = '—';
+      salDisplay = '—';
+      tipText    = 'กำหนด Rate ตรงๆ ไม่คำนวณจากเงินเดือน';
+      freelancerNames.push(m.name);
+      footerHTML += '<div class="rs-footer-row" style="color:var(--text-tertiary)"><span>'+m.name+'</span><span>— (Freelance คิดตาม actual)</span></div>';
+    }
+
+    var badge = m.type==='employee'
+      ? '<span class="rs-badge-emp">พนักงาน</span>'
+      : '<span class="rs-badge-free">Freelance</span>';
+
+    var isOpen = !!expanded[m.id];
+
+    /* Main row */
+    var tr = document.createElement('tr');
+    tr.className = 'rs-mr';
+    tr.innerHTML =
+      '<td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-sm '+m.avCls+'">'+m.ini+'</div> '+m.name+'</div></td>'+
+      '<td style="color:var(--text-tertiary)">'+m.role+'</td>'+
+      '<td>'+badge+'</td>'+
+      '<td>'+salDisplay+'</td>'+
+      '<td>'+leave+'</td>'+
+      '<td>'+netY+'</td>'+
+      '<td><div class="rs-tip">'+rsFmt(rate)+' ฿<div class="rs-tip-box">'+tipText+'</div></div></td>'+
+      '<td>'+costStr+'</td>'+
+      '<td><button class="rs-edit-btn'+(isOpen?' active':'')+'" onclick="rsToggleEdit('+m.id+',this)">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+      '</button></td>';
+    tbody.appendChild(tr);
+
+    /* Detail row */
+    var td = document.createElement('tr');
+    td.className = 'rs-mr-detail';
+    td.dataset.id = m.id;
+    td.style.display = isOpen ? '' : 'none';
+
+    var salField = m.type==='employee'
+      ? '<div class="rs-detail-field"><div class="rs-detail-label">เงินเดือน (฿/เดือน)</div><input class="rs-detail-input" style="width:100%" type="text" value="'+rsFmt(sal)+'" onchange="rsMemberSalaryChange('+m.id+',this.value)"></div>'
+      : '<div class="rs-detail-field"><div class="rs-detail-label">Rate/man-day (฿)</div><input class="rs-detail-input" style="width:100%" type="text" value="'+rsFmt(rate)+'" onchange="rsMemberRateChange('+m.id+',this.value)"></div>';
+
+    td.innerHTML = '<td colspan="9"><div class="rs-detail-box">'+
+      salField+
+      '<div class="rs-detail-field"><div class="rs-detail-label">วันลา/ปี (override)</div><input class="rs-detail-input" style="width:100%" type="number" min="0" value="'+leave+'" onchange="rsMemberLeaveChange('+m.id+',this.value)"></div>'+
+      '<div class="rs-detail-field"><div class="rs-detail-label">ประเภท</div><select class="rs-detail-select" style="width:100%" onchange="rsMemberTypeChange('+m.id+',this.value)"><option value="employee"'+(m.type==='employee'?' selected':'')+'>พนักงาน</option><option value="freelance"'+(m.type==='freelance'?' selected':'')+'>Freelance</option></select></div>'+
+      '</div></td>';
+    tbody.appendChild(td);
+  });
+
+  /* Footer */
+  var fr = document.getElementById('rsFooterRows');
+  var ft = document.getElementById('rsFooterTotal');
+  var fn = document.getElementById('rsFooterNote');
+  if(fr) fr.innerHTML = footerHTML;
+  if(ft) ft.textContent = rsFmt(empTotal)+' ฿/เดือน';
+  if(fn) fn.textContent = freelancerNames.length ? '(ไม่รวม Freelance: '+freelancerNames.join(', ')+')' : '';
+}
+
+function rsToggleEdit(id, btn) {
+  var row = document.querySelector('tr.rs-mr-detail[data-id="'+id+'"]');
+  if (!row) return;
+  var hidden = row.style.display === 'none';
+  row.style.display = hidden ? '' : 'none';
+  btn.classList.toggle('active', hidden);
+}
+
+function rsFindMember(id) {
+  for (var i=0;i<rsMembers.length;i++) if(rsMembers[i].id===id) return rsMembers[i];
+  return null;
+}
+
+function rsMemberSalaryChange(id, val) {
+  var m = rsFindMember(id); if(m){ m.salary = rsParseSalary(val); rsRecalc(); }
+}
+function rsMemberRateChange(id, val) {
+  var m = rsFindMember(id); if(m){ m.directRate = rsParseSalary(val); rsRecalc(); }
+}
+function rsMemberLeaveChange(id, val) {
+  var m = rsFindMember(id); if(m){ m.leaveOvr = parseInt(val)||0; rsRecalc(); }
+}
+function rsMemberTypeChange(id, val) {
+  var m = rsFindMember(id); if(m){ m.type = val; rsRecalc(); }
+}
+
+function switchTabByName(tabId) {
+  var btn = document.querySelector('.settings-tab[onclick*="\''+tabId+'\'"]');
+  if (btn) btn.click();
+}
+
+/* Trigger rsRecalc when Rate tab opened */
+document.querySelector('.settings-tab[onclick*="rates"]').addEventListener('click', function(){
+  setTimeout(function(){ rsRecalc(); }, 30);
+});
 </script>
 </body>
 </html>

@@ -123,40 +123,198 @@
 <div class="app-layout">
 
 <!-- ═══ SIDEBAR ═══ -->
-<nav class="sidebar">
-  <div class="sidebar-logo">
-    <div class="sidebar-logo-mark">
-      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg>
+<nav class="sidebar" id="sidebar">
+  <!-- Org Switcher -->
+  <div class="sidebar-org" onclick="document.getElementById('orgDropdown').classList.toggle('show'); event.stopPropagation();">
+    <div class="sidebar-org-icon">E</div>
+    <div class="sidebar-org-detail">
+      <div class="sidebar-org-name">Egency</div>
+      <div class="sidebar-org-plan">Pro · 12 members</div>
     </div>
-    <div class="sidebar-logo-text">Work<span>Flow</span></div>
+    <span class="sidebar-org-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </span>
+
+    <!-- Org Dropdown -->
+    <div class="sidebar-org-dropdown" id="orgDropdown">
+      <div class="sidebar-org-dropdown-item current">
+        <span class="org-dd-dot" style="background: var(--brand-600)"></span>
+        Egency
+        <svg class="org-dd-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <a href="account-dashboard.html" class="sidebar-org-dropdown-item">
+        <span class="org-dd-dot" style="background: #12b76a"></span>
+        Seamless
+      </a>
+      <div class="sidebar-org-dropdown-divider"></div>
+      <a href="account-dashboard.html" class="sidebar-org-dropdown-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        สลับ Organization
+      </a>
+    </div>
   </div>
+
+  <!-- Search -->
+  <div class="sidebar-search">
+    <div class="sidebar-search-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span class="sidebar-search-text">ค้นหา…</span>
+      <span class="sidebar-search-kbd">⌘K</span>
+    </div>
+  </div>
+
+  <!-- Main Menu -->
   <div class="sidebar-section">
     <div class="sidebar-label">เมนูหลัก</div>
-    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
-    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
-    <a href="inbox.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
-    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
-    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
-    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+    <a href="dashboard.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="sidebar-text">แดชบอร์ด</span>
+    </a>
+    <a href="my-tasks.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span class="sidebar-text">งานของฉัน</span>
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a href="inbox.html" class="sidebar-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+      <span class="sidebar-text">กล่องข้อความ</span>
+      <span class="sidebar-badge">3</span>
+    </a>
+    <a href="task-board.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span class="sidebar-text">บอร์ดงาน</span>
+    </a>
+    <a href="report.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      <span class="sidebar-text">รายงาน</span>
+    </a>
+    <a href="manday.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="sidebar-text">แมนเดย์</span>
+    </a>
   </div>
+
   <div class="sidebar-divider"></div>
+
+  <!-- Project Tree (collapsible) -->
   <div class="sidebar-section">
-    <div class="sidebar-label">โปรเจค — Egency</div>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
-    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+    <div class="sidebar-tree-header" id="projectTreeToggle" onclick="this.classList.toggle('collapsed')">
+      <div class="sidebar-label">โปรเจค</div>
+      <span class="sidebar-tree-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+    </div>
+    <div class="sidebar-tree-list" id="sidebarProjTree">
+      <!-- Jigsaw ERP -->
+      <div class="sb-proj" id="sbProj_jigsaw">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_jigsaw',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#6172f3"></span>
+            <span class="proj-name">Jigsaw ERP</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','Jigsaw ERP','sbProj_jigsaw')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children">
+        <div class="sb-space" id="sbSpace_uxui">
+          <div class="sb-space-row">
+            <span class="sb-chevron" onclick="sbToggle('sbSpace_uxui',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+            <svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            <span class="sb-space-name">UX/UI</span>
+            <button class="sb-add-btn" onclick="showSbPopover(event,'space','UX/UI','sbSpace_uxui')" title="เพิ่ม List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div class="sb-space-children">
+            <a href="task-board.html" class="sb-list active"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Login Screen</span></a>
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Dashboard</span></a>
+          </div>
+        </div>
+        <div class="sb-space" id="sbSpace_backend">
+          <div class="sb-space-row">
+            <span class="sb-chevron" style="transform:rotate(-90deg)" onclick="sbToggle('sbSpace_backend',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+            <svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            <span class="sb-space-name">Backend</span>
+            <button class="sb-add-btn" onclick="showSbPopover(event,'space','Backend','sbSpace_backend')" title="เพิ่ม List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <div class="sb-space-children" style="display:none">
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>API Endpoints</span></a>
+          </div>
+        </div>
+        </div>
+      </div>
+      <!-- OTT Platform -->
+      <div class="sb-proj" id="sbProj_ott">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_ott',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#12b76a"></span>
+            <span class="proj-name">OTT Platform</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','OTT Platform','sbProj_ott')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+            <a href="task-board.html" class="sb-list"><svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Stream Tasks</span></a>
+        </div>
+      </div>
+      <!-- Franchise Portal -->
+      <div class="sb-proj" id="sbProj_franchise">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_franchise',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#f79009"></span>
+            <span class="proj-name">Franchise Portal</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','Franchise Portal','sbProj_franchise')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+        </div>
+      </div>
+      <!-- AI Chatbot -->
+      <div class="sb-proj" id="sbProj_aichatbot">
+        <div class="sb-proj-row">
+          <span class="sb-chevron" onclick="sbToggle('sbProj_aichatbot',event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          <a href="task-board.html" class="sb-proj-link">
+            <span class="proj-dot" style="background:#f04438"></span>
+            <span class="proj-name">AI Chatbot</span>
+          </a>
+          <button class="sb-add-btn" onclick="showSbPopover(event,'project','AI Chatbot','sbProj_aichatbot')" title="เพิ่ม Space หรือ List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="sb-proj-children" style="display:none">
+        </div>
+      </div>
+
+      <div class="org-switcher" onclick="this.querySelector('.dropdown').classList.toggle('active');event.stopPropagation()">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div><a class="dropdown-item" href="org-settings.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Organization Settings</a>
+        </div>
+      </div>
+    </div>
   </div>
+
   <div class="sidebar-divider"></div>
+
   <div class="sidebar-section">
-    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่า</a>
+    <a href="project-settings.html" class="sidebar-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="sidebar-text">ตั้งค่าโปรเจค</span>
+    </a>
   </div>
+
+  <!-- USER BOTTOM + Collapse toggle -->
   <div class="sidebar-bottom">
     <a class="sidebar-user" href="profile.html">
       <div class="avatar av-md av-c1">อ</div>
-      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">สมชาย</div>
+        <div class="sidebar-user-role">Admin · Egency</div>
+      </div>
     </a>
+    <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" title="ย่อ/ขยาย Sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19l-7-7 7-7"/><path d="M18 19l-7-7 7-7"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -335,6 +493,206 @@ function checkEmpty() {
 function switchInboxTab(el) {
   document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+}
+</script>
+<script>document.addEventListener('click',function(){var d=document.getElementById('orgDropdown');if(d)d.classList.remove('show')});</script>
+
+
+
+<!-- ═══ TASK LIST CREATION MODAL ═══ -->
+<div class="modal-overlay" id="tlModal" onclick="if(event.target===this)closeTlModal()">
+  <div class="tl-modal" onclick="event.stopPropagation()">
+    <div class="tl-modal-header">
+      <span id="tlModalTitle">สร้าง Task List</span>
+      <button class="add-sl-close" onclick="closeTlModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="tl-modal-body">
+      <div>
+        <div class="tl-label">ชื่อ Task List</div>
+        <input class="tl-input" id="tlListName" placeholder="เช่น Sprint 1, Bug Fixes, Design Tasks…" autocomplete="off" />
+      </div>
+      <div>
+        <div class="tl-label">Template</div>
+        <div class="tl-templates">
+          <div class="tl-tmpl selected" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Simple Task</div><div class="tl-tmpl-desc">To Do / In Progress / Done</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Ticket</div><div class="tl-tmpl-desc">Open / Dev / Review / Done</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Bug Report</div><div class="tl-tmpl-desc">New / In Fix / Testing / Closed</div></div>
+          <div class="tl-tmpl" onclick="selectTlTmpl(this)"><div class="tl-tmpl-name">Sprint Board</div><div class="tl-tmpl-desc">Backlog / Sprint / Done</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="tl-label">Status เริ่มต้น</div>
+        <div class="tl-status-preview">
+          <div class="tl-status-dots">
+            <span class="tl-status-dot" style="background:#94a3b8"></span>
+            <span class="tl-status-dot" style="background:#6172f3"></span>
+            <span class="tl-status-dot" style="background:#12b76a"></span>
+          </div>
+          <span>รับมาจาก Project อัตโนมัติ</span>
+          <a href="#" class="tl-status-edit" onclick="return false;">แก้ไข</a>
+        </div>
+      </div>
+    </div>
+    <div class="tl-modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeTlModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmCreateList()">สร้าง</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Sidebar tree toggle ── */
+function sbToggle(id, e) {
+  if (e) e.stopPropagation();
+  var el = document.getElementById(id); if (!el) return;
+  var children = el.querySelector(':scope > .sb-proj-children, :scope > .sb-space-children');
+  var chevron  = el.querySelector(':scope > .sb-proj-row > .sb-chevron, :scope > .sb-space-row > .sb-chevron');
+  if (!children) return;
+  var hidden = children.style.display === 'none';
+  children.style.display = hidden ? '' : 'none';
+  if (chevron) chevron.style.transform = hidden ? '' : 'rotate(-90deg)';
+}
+
+/* ── Add popover ── */
+var _sbPopoverCloseHandler = null;
+function showSbPopover(e, type, name, parentId) {
+  e.stopPropagation();
+  closeSbPopover();
+  var items = type === 'project'
+    ? [{icon:'🗂',label:'Space',desc:'แบ่งแผนกหรือหมวดงาน',act:'space'},{icon:'📋',label:'Task List',desc:'เริ่มสร้างงานได้เลย',act:'list'}]
+    : [{icon:'📋',label:'Task List',desc:'เริ่มสร้างงานได้เลย',act:'list'}];
+  var pop = document.createElement('div');
+  pop.className = 'sb-add-popover'; pop.id = 'sbPopover';
+  var titleEl = document.createElement('div');
+  titleEl.className = 'sb-popover-title'; titleEl.textContent = 'เพิ่มใน ' + name;
+  pop.appendChild(titleEl);
+  items.forEach(function(item) {
+    var row = document.createElement('div');
+    row.className = 'sb-popover-item';
+    row.innerHTML = '<span class="sb-popover-icon">' + item.icon + '</span><div><div class="sb-popover-label">' + item.label + '</div><div class="sb-popover-desc">' + item.desc + '</div></div>';
+    row.onclick = function() {
+      closeSbPopover();
+      if (item.act === 'space') startAddSpace(parentId);
+      else openTlModal(name, parentId);
+    };
+    pop.appendChild(row);
+  });
+  document.body.appendChild(pop);
+  var r = e.currentTarget.getBoundingClientRect();
+  var pw = 220; var left = r.right + 8;
+  if (left + pw > window.innerWidth - 8) left = r.left - pw - 4;
+  pop.style.left = Math.max(8, left) + 'px';
+  pop.style.top  = Math.max(8, r.top - 4) + 'px';
+  setTimeout(function() {
+    _sbPopoverCloseHandler = function(ev) { if (!pop.contains(ev.target)) closeSbPopover(); };
+    document.addEventListener('click', _sbPopoverCloseHandler);
+  }, 0);
+}
+function closeSbPopover() {
+  if (_sbPopoverCloseHandler) { document.removeEventListener('click', _sbPopoverCloseHandler); _sbPopoverCloseHandler = null; }
+  var p = document.getElementById('sbPopover'); if (p) p.remove();
+}
+
+/* ── Inline space creation ── */
+function startAddSpace(parentId) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-proj-children'); if (!children) return;
+  children.style.display = '';
+  var chevron = parent.querySelector(':scope > .sb-proj-row > .sb-chevron');
+  if (chevron) chevron.style.transform = '';
+  var row = document.createElement('div');
+  row.className = 'sb-inline-row';
+  row.innerHTML = '<svg class="sb-space-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><input class="sb-inline-input" placeholder="ชื่อ Space\u2026" />';
+  children.appendChild(row);
+  var inp = row.querySelector('input'); inp.focus();
+  inp.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Enter') { ev.preventDefault(); var n = inp.value.trim(); if (n) { row.remove(); createSpace(parentId, n); } }
+    else if (ev.key === 'Escape') { row.remove(); }
+  });
+  inp.addEventListener('blur', function() { setTimeout(function() { if (row.parentNode) row.remove(); }, 200); });
+}
+
+function createSpace(parentId, name) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-proj-children'); if (!children) return;
+  var sid = 'sbSpace_' + Date.now();
+  /* Build with DOM to avoid quote-escaping hell */
+  var spaceEl = document.createElement('div');
+  spaceEl.className = 'sb-space'; spaceEl.id = sid;
+
+  var row = document.createElement('div'); row.className = 'sb-space-row';
+
+  var chev = document.createElement('span'); chev.className = 'sb-chevron';
+  chev.style.transform = 'rotate(-90deg)';
+  chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  (function(id){ chev.addEventListener('click', function(e){ sbToggle(id, e); }); })(sid);
+
+  var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('class','sb-space-icon'); icon.setAttribute('viewBox','0 0 24 24');
+  icon.setAttribute('fill','none'); icon.setAttribute('stroke','currentColor');
+  icon.setAttribute('stroke-width','1.8'); icon.setAttribute('stroke-linecap','round'); icon.setAttribute('stroke-linejoin','round');
+  var pathEl = document.createElementNS('http://www.w3.org/2000/svg','path');
+  pathEl.setAttribute('d','M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z');
+  icon.appendChild(pathEl);
+
+  var nameEl = document.createElement('span'); nameEl.className = 'sb-space-name'; nameEl.textContent = name;
+
+  var addBtn = document.createElement('button'); addBtn.className = 'sb-add-btn'; addBtn.title = 'เพิ่ม List';
+  addBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+  (function(n, id){ addBtn.addEventListener('click', function(e){ showSbPopover(e,'space',n,id); }); })(name, sid);
+
+  row.appendChild(chev); row.appendChild(icon); row.appendChild(nameEl); row.appendChild(addBtn);
+
+  var spaceChildren = document.createElement('div');
+  spaceChildren.className = 'sb-space-children'; spaceChildren.style.display = 'none';
+
+  spaceEl.appendChild(row); spaceEl.appendChild(spaceChildren);
+  children.appendChild(spaceEl);
+  spaceEl.classList.add('sb-new-highlight');
+  setTimeout(function(){ spaceEl.classList.remove('sb-new-highlight'); }, 1500);
+}
+
+/* ── Task List modal ── */
+var _tlParentId = null;
+function openTlModal(name, parentId) {
+  _tlParentId = parentId;
+  var overlay = document.getElementById('tlModal'); if (!overlay) return;
+  document.getElementById('tlModalTitle').textContent = 'เพิ่มใน ' + name;
+  document.getElementById('tlListName').value = '';
+  overlay.querySelectorAll('.tl-tmpl').forEach(function(t){ t.classList.remove('selected'); });
+  var first = overlay.querySelector('.tl-tmpl'); if (first) first.classList.add('selected');
+  overlay.classList.add('active');
+  setTimeout(function(){ document.getElementById('tlListName').focus(); }, 100);
+}
+function closeTlModal() {
+  var o = document.getElementById('tlModal'); if (o) o.classList.remove('active');
+}
+function selectTlTmpl(el) {
+  el.closest('.tl-templates').querySelectorAll('.tl-tmpl').forEach(function(t){ t.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function confirmCreateList() {
+  var inp = document.getElementById('tlListName');
+  var name = (inp.value || '').trim();
+  if (!name) { inp.focus(); inp.classList.add('tl-input-error'); return; }
+  inp.classList.remove('tl-input-error');
+  var pid = _tlParentId; closeTlModal();
+  addListToSidebar(pid, name);
+}
+function addListToSidebar(parentId, name) {
+  var parent = document.getElementById(parentId); if (!parent) return;
+  var children = parent.querySelector(':scope > .sb-space-children, :scope > .sb-proj-children'); if (!children) return;
+  children.style.display = '';
+  var chevron = parent.querySelector(':scope > .sb-proj-row > .sb-chevron, :scope > .sb-space-row > .sb-chevron');
+  if (chevron) chevron.style.transform = '';
+  document.querySelectorAll('.sb-list.active').forEach(function(l){ l.classList.remove('active'); });
+  var el = document.createElement('a');
+  el.className = 'sb-list active'; el.href = 'task-board.html';
+  el.innerHTML = '<svg class="sb-list-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>' + name + '</span>';
+  children.appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
 </body>

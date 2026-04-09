@@ -1,0 +1,11 @@
+# Python scripts (dev tools only)
+*.py
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
