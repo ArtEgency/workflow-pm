@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — Super Team</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ TEAM PAGE SPECIFIC ═══ */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-6);
+}
+.page-header-left h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+.page-header-left p { font-size: 14px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* STATS BAR */
+.team-stats {
+  display: flex; gap: var(--sp-4); margin-bottom: var(--sp-6);
+}
+.team-stat-card {
+  flex: 1; background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); padding: var(--sp-4) var(--sp-5); box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; gap: var(--sp-3);
+}
+.team-stat-icon {
+  width: 40px; height: 40px; border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.team-stat-value { font-size: 22px; font-weight: 700; font-family: var(--font-mono); }
+.team-stat-label { font-size: 13px; color: var(--text-tertiary); }
+
+/* TABLE CARD */
+.table-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.table-card-header {
+  padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-secondary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.table-card-header h3 { font-size: 16px; font-weight: 700; }
+
+/* TEAM TABLE */
+.team-table { width: 100%; border-collapse: collapse; }
+.team-table th {
+  text-align: left; font-size: 12px; font-weight: 600; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 16px;
+  border-bottom: 1px solid var(--border-primary); background: var(--surface-secondary);
+}
+.team-table td {
+  padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--border-secondary); vertical-align: middle;
+}
+.team-table tr:hover td { background: var(--n-50); }
+.member-cell { display: flex; align-items: center; gap: var(--sp-3); }
+.member-cell-info { display: flex; flex-direction: column; }
+.member-cell-name { font-weight: 600; font-size: 14.5px; }
+.member-cell-email { font-size: 12px; color: var(--text-tertiary); }
+
+.org-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+.org-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; padding: 2px 8px;
+  border-radius: var(--r-full); background: var(--brand-50); color: var(--brand-700);
+  border: 1px solid var(--brand-200);
+}
+
+.role-select {
+  padding: 4px 8px; font-size: 13px; border: 1px solid var(--border-primary);
+  border-radius: var(--r-sm); background: var(--surface-primary);
+  font-family: var(--font-sans); cursor: pointer;
+}
+
+.status-active { color: var(--success-700); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.status-pending { color: var(--warning-700); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+
+.action-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  border: none; background: transparent; color: var(--n-400);
+  cursor: pointer; transition: all var(--t-fast);
+}
+.action-btn:hover { background: var(--n-100); color: var(--text-primary); }
+.action-btn.danger:hover { background: var(--error-50); color: var(--error-700); }
+
+/* TOAST */
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-12px);
+  background: var(--n-900); color: #fff; padding: 10px 20px; border-radius: var(--r-lg);
+  font-size: 14px; font-weight: 600; box-shadow: var(--shadow-xl);
+  opacity: 0; transition: all var(--t-med) var(--ease); z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ORG SWITCHER */
+.org-switcher {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+  background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md);
+  font-size: 14px; font-weight: 600; color: var(--brand-700);
+  cursor: pointer; transition: all var(--t-fast); position: relative;
+}
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg></div><div class="sidebar-logo-text">Work<span>Flow</span></div></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
+    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
+    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
+    <a href="project-list.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> โปรเจค</a>
+    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
+    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
+    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">ตั้งค่า</div>
+    <a href="team.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Super Team</a>
+    <a href="org-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Organization</a>
+    <a href="work-calendar.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Work Calendar</a>
+    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> ตั้งค่าโปรเจค</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">Super Team</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      ตั้งค่า
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      Team
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="ค้นหาสมาชิก..."></div>
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="dropdown-item"><span style="width:8px;height:8px;border-radius:50%;background:#12b76a"></span> Seamless</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);"><div style="font-size:13px;font-weight:600;">สมชาย</div><div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div></div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Super Team</h1>
+        <p>จัดการสมาชิกทั้งหมดข้าม Organization</p>
+      </div>
+      <button class="btn btn-primary btn-md" onclick="openInviteModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        เชิญสมาชิก
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="team-stats">
+      <div class="team-stat-card">
+        <div class="team-stat-icon" style="background:var(--brand-50);">👥</div>
+        <div><div class="team-stat-value">5</div><div class="team-stat-label">สมาชิกทั้งหมด</div></div>
+      </div>
+      <div class="team-stat-card">
+        <div class="team-stat-icon" style="background:var(--success-50);">✅</div>
+        <div><div class="team-stat-value">3</div><div class="team-stat-label">Active</div></div>
+      </div>
+      <div class="team-stat-card">
+        <div class="team-stat-icon" style="background:var(--warning-50);">⏳</div>
+        <div><div class="team-stat-value">2</div><div class="team-stat-label">Pending Invite</div></div>
+      </div>
+    </div>
+
+    <!-- MEMBER TABLE -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>สมาชิกทั้งหมด</h3>
+        <div style="font-size:13px;color:var(--text-tertiary);">5 คน</div>
+      </div>
+      <table class="team-table">
+        <thead><tr><th>สมาชิก</th><th>Organizations</th><th>Role</th><th>สถานะ</th><th style="width:100px"></th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="member-cell"><div class="avatar av-sm av-c3">ส</div><div class="member-cell-info"><div class="member-cell-name">สมชาย</div><div class="member-cell-email">somchai@egency.co</div></div></div></td>
+            <td><div class="org-badges"><span class="org-badge"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand-500)"></span> Egency</span><span class="org-badge" style="background:var(--success-50);color:var(--success-700);border-color:var(--success-200);"><span style="width:6px;height:6px;border-radius:50%;background:var(--success-500)"></span> Seamless</span></div></td>
+            <td><select class="role-select"><option>Owner</option><option selected>Admin</option><option>PM</option><option>Member</option></select></td>
+            <td><span class="status-active">🟢 Active</span></td>
+            <td>
+              <button class="action-btn" title="แก้ไข"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="member-cell"><div class="avatar av-sm av-c2">อ</div><div class="member-cell-info"><div class="member-cell-name">อรัญ</div><div class="member-cell-email">arun@egency.co</div></div></div></td>
+            <td><div class="org-badges"><span class="org-badge"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand-500)"></span> Egency</span></div></td>
+            <td><select class="role-select"><option>Owner</option><option>Admin</option><option>PM</option><option selected>Member</option></select></td>
+            <td><span class="status-active">🟢 Active</span></td>
+            <td>
+              <button class="action-btn" title="แก้ไข"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn danger" title="ลบ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="member-cell"><div class="avatar av-sm av-c1">พ</div><div class="member-cell-info"><div class="member-cell-name">พัชร</div><div class="member-cell-email">patchara@egency.co</div></div></div></td>
+            <td><div class="org-badges"><span class="org-badge"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand-500)"></span> Egency</span></div></td>
+            <td><select class="role-select"><option>Owner</option><option>Admin</option><option>PM</option><option selected>Member</option></select></td>
+            <td><span class="status-active">🟢 Active</span></td>
+            <td>
+              <button class="action-btn" title="แก้ไข"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn danger" title="ลบ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+            </td>
+          </tr>
+          <tr style="background:var(--warning-50);">
+            <td><div class="member-cell"><div class="avatar av-sm" style="background:var(--n-200);color:var(--n-500);">น</div><div class="member-cell-info"><div class="member-cell-name" style="color:var(--text-tertiary);">นภดล</div><div class="member-cell-email">noppadon@egency.co</div></div></div></td>
+            <td><div class="org-badges"><span class="org-badge" style="opacity:0.6;"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand-500)"></span> Egency</span></div></td>
+            <td><select class="role-select"><option>Owner</option><option>Admin</option><option>PM</option><option selected>Member</option></select></td>
+            <td><span class="status-pending">🟡 Pending</span></td>
+            <td>
+              <button class="action-btn" title="ส่งคำเชิญอีกครั้ง" onclick="showToast('ส่งคำเชิญอีกครั้งแล้ว')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              <button class="action-btn danger" title="ยกเลิกคำเชิญ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </td>
+          </tr>
+          <tr style="background:var(--warning-50);">
+            <td><div class="member-cell"><div class="avatar av-sm" style="background:var(--n-200);color:var(--n-500);">ป</div><div class="member-cell-info"><div class="member-cell-name" style="color:var(--text-tertiary);">ปรียา</div><div class="member-cell-email">priya@egency.co</div></div></div></td>
+            <td><div class="org-badges"><span class="org-badge" style="opacity:0.6;"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand-500)"></span> Egency</span></div></td>
+            <td><select class="role-select"><option>Owner</option><option>Admin</option><option>PM</option><option selected>Member</option></select></td>
+            <td><span class="status-pending">🟡 Pending</span></td>
+            <td>
+              <button class="action-btn" title="ส่งคำเชิญอีกครั้ง" onclick="showToast('ส่งคำเชิญอีกครั้งแล้ว')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              <button class="action-btn danger" title="ยกเลิกคำเชิญ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="inviteModal">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <h3>เชิญสมาชิกใหม่</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeInviteModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">Email</label>
+          <input class="input" type="email" placeholder="name@company.com">
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">Role</label>
+          <select class="input"><option selected>Member</option><option>PM</option><option>Admin</option></select>
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px;">Organization</label>
+          <select class="input"><option selected>Egency</option><option>Seamless</option><option>ทุก Organization</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeInviteModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-md" onclick="closeInviteModal();showToast('ส่งคำเชิญแล้ว ✉️')">ส่งคำเชิญ</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleOrgDropdown(e) { e&&e.stopPropagation(); document.getElementById('userDropdown').classList.remove('active'); document.getElementById('orgDropdown').classList.toggle('active'); }
+function toggleUserDropdown(e) { e&&e.stopPropagation(); document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.toggle('active'); }
+document.addEventListener('click', () => { document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.remove('active'); });
+
+function openInviteModal() { document.getElementById('inviteModal').classList.add('active'); }
+function closeInviteModal() { document.getElementById('inviteModal').classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }); });
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '✅ บันทึกแล้ว';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>

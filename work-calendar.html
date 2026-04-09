@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkFlow PM — Work Calendar</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ WORK CALENDAR SPECIFIC ═══ */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-6); }
+.page-header-left h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+.page-header-left p { font-size: 14px; color: var(--text-tertiary); margin-top: 2px; }
+
+.calendar-layout { display: grid; grid-template-columns: 1fr 340px; gap: var(--sp-6); align-items: flex-start; }
+
+/* YEAR GRID */
+.year-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm); padding: var(--sp-5);
+}
+.year-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-5); }
+.year-title { font-size: 18px; font-weight: 700; }
+.year-nav { display: flex; gap: var(--sp-2); }
+.year-nav-btn {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  border: 1px solid var(--border-primary); background: var(--surface-primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all var(--t-fast); color: var(--text-secondary);
+}
+.year-nav-btn:hover { background: var(--brand-50); border-color: var(--brand-300); color: var(--brand-600); }
+
+.calendar-year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+.cal-month { font-size: 12px; }
+.cal-month-title { font-size: 13px; font-weight: 700; text-align: center; margin-bottom: var(--sp-2); color: var(--brand-700); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; }
+.cal-header { font-size: 10px; font-weight: 600; color: var(--text-tertiary); padding: 2px; }
+.cal-day {
+  font-size: 11px; padding: 3px; border-radius: var(--r-xs);
+  cursor: pointer; transition: all var(--t-fast); line-height: 1.4;
+}
+.cal-day:hover { background: var(--brand-50); }
+.cal-day.empty { cursor: default; }
+.cal-day.weekend { color: var(--n-300); }
+.cal-day.holiday { background: var(--error-50); color: var(--error-700); font-weight: 700; }
+.cal-day.dayoff { background: var(--warning-50); color: var(--warning-700); font-weight: 700; }
+.cal-day.today { box-shadow: inset 0 0 0 2px var(--brand-500); font-weight: 700; }
+.cal-day.selected { background: var(--brand-500); color: #fff; font-weight: 700; }
+
+/* LEGEND */
+.cal-legend { display: flex; gap: var(--sp-4); margin-top: var(--sp-4); font-size: 12px; color: var(--text-tertiary); }
+.cal-legend-item { display: flex; align-items: center; gap: 4px; }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* RIGHT SIDEBAR */
+.cal-sidebar {
+  position: sticky; top: calc(64px + var(--sp-6));
+  display: flex; flex-direction: column; gap: var(--sp-5);
+}
+.cal-sidebar-card {
+  background: var(--surface-primary); border: 1px solid var(--border-primary);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.cal-sidebar-header {
+  padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-secondary);
+  font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between;
+}
+.cal-sidebar-body { padding: var(--sp-4) var(--sp-5); }
+
+/* HOLIDAY LIST */
+.holiday-item {
+  display: flex; align-items: center; gap: var(--sp-3); padding: 8px 0;
+  border-bottom: 1px solid var(--border-secondary); font-size: 13px;
+}
+.holiday-item:last-child { border-bottom: none; }
+.holiday-dot { width: 8px; height: 8px; border-radius: var(--r-full); flex-shrink: 0; }
+.holiday-date { font-family: var(--font-mono); font-weight: 600; min-width: 70px; color: var(--brand-600); font-size: 12px; }
+.holiday-name { flex: 1; }
+.holiday-remove {
+  width: 20px; height: 20px; border-radius: var(--r-sm); border: none;
+  background: transparent; color: var(--n-300); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--t-fast);
+}
+.holiday-remove:hover { background: var(--error-50); color: var(--error-500); }
+
+/* ADD DAY OFF */
+.add-dayoff {
+  display: flex; gap: var(--sp-2); margin-top: var(--sp-3);
+}
+.add-dayoff input {
+  flex: 1; padding: 6px 10px; font-size: 13px;
+  border: 1px solid var(--border-primary); border-radius: var(--r-sm);
+  font-family: var(--font-sans);
+}
+
+/* STATS */
+.cal-stats { display: flex; flex-direction: column; gap: var(--sp-3); }
+.cal-stat-row { display: flex; justify-content: space-between; font-size: 13px; }
+.cal-stat-label { color: var(--text-tertiary); }
+.cal-stat-value { font-weight: 700; font-family: var(--font-mono); }
+
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-12px); background: var(--n-900); color: #fff; padding: 10px 20px; border-radius: var(--r-lg); font-size: 14px; font-weight: 600; box-shadow: var(--shadow-xl); opacity: 0; transition: all var(--t-med) var(--ease); z-index: 999; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.org-switcher { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md); font-size: 14px; font-weight: 600; color: var(--brand-700); cursor: pointer; transition: all var(--t-fast); position: relative; }
+.org-switcher:hover { background: var(--brand-100); }
+.org-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--brand-500); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><div class="sidebar-logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="white"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="white"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/></svg></div><div class="sidebar-logo-text">Work<span>Flow</span></div></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">เมนูหลัก</div>
+    <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> แดชบอร์ด</a>
+    <a href="my-tasks.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> งานของฉัน <span class="sidebar-badge">5</span></a>
+    <a href="inbox.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> กล่องข้อความ <span class="sidebar-badge">3</span></a>
+    <a href="project-list.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> โปรเจค</a>
+    <a href="task-board.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> บอร์ดงาน</a>
+    <a href="report.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> รายงาน</a>
+    <a href="manday.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แมนเดย์</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">โปรเจค — Egency</div>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#6172f3"></span> Jigsaw ERP</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#12b76a"></span> OTT Platform</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f79009"></span> Franchise Portal</a>
+    <a href="task-board.html" class="sidebar-project"><span class="proj-dot" style="background:#f04438"></span> AI Chatbot</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">ตั้งค่า</div>
+    <a href="team.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Super Team</a>
+    <a href="org-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Organization</a>
+    <a href="work-calendar.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Work Calendar</a>
+    <a href="project-settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09"/></svg> ตั้งค่าโปรเจค</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a class="sidebar-user" href="profile.html">
+      <div class="avatar av-md av-c1">อ</div>
+      <div class="sidebar-user-info"><div class="sidebar-user-name">สมชาย</div><div class="sidebar-user-role">Admin · Egency</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--n-400)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">Work Calendar</div>
+    <div class="topbar-breadcrumb">
+      <a href="dashboard.html">Egency</a>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      ตั้งค่า
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      Calendar
+    </div>
+    <div class="topbar-right">
+      <div class="org-switcher" onclick="toggleOrgDropdown(event)">
+        <span class="org-dot"></span> Egency
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <div class="dropdown" id="orgDropdown" style="top:42px;right:0;min-width:200px;">
+          <div class="dropdown-item" style="background:var(--brand-50);color:var(--brand-700);"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand-500)"></span> Egency</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="avatar av-sm av-c1" style="cursor:pointer;border:none;" onclick="toggleUserDropdown(event)">อ</div>
+        <div class="dropdown" id="userDropdown" style="top:42px;right:0;min-width:180px;">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border-secondary);"><div style="font-size:13px;font-weight:600;">สมชาย</div><div style="font-size:11px;color:var(--text-tertiary);">admin@egency.co</div></div>
+          <a class="dropdown-item" href="profile.html">โปรไฟล์</a>
+          <div style="height:1px;background:var(--border-secondary);margin:4px 0;"></div>
+          <a class="dropdown-item" href="login.html" style="color:var(--error-700);">ออกจากระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Work Calendar</h1>
+        <p>ปฏิทินการทำงานของ Egency — ปี 2569</p>
+      </div>
+      <button class="btn btn-primary btn-md" onclick="showToast('บันทึกปฏิทินแล้ว ✅')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        บันทึก
+      </button>
+    </div>
+
+    <div class="calendar-layout">
+      <!-- LEFT: YEAR GRID -->
+      <div class="year-card">
+        <div class="year-header">
+          <div class="year-title">📅 ปี 2569 (2026)</div>
+          <div class="year-nav">
+            <button class="year-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="year-nav-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+        </div>
+        <div class="calendar-year-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--error-50);border:1px solid var(--error-200);"></div> วันหยุดนักขัตฤกษ์</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--warning-50);border:1px solid var(--warning-200);"></div> Day off</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--brand-500);"></div> วันนี้</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SIDEBAR -->
+      <div class="cal-sidebar">
+        <div class="cal-sidebar-card">
+          <div class="cal-sidebar-header">📊 สรุป</div>
+          <div class="cal-sidebar-body">
+            <div class="cal-stats">
+              <div class="cal-stat-row"><span class="cal-stat-label">วันทำงานทั้งปี</span><span class="cal-stat-value">245 วัน</span></div>
+              <div class="cal-stat-row"><span class="cal-stat-label">วันหยุดนักขัตฤกษ์</span><span class="cal-stat-value" style="color:var(--error-700)">16 วัน</span></div>
+              <div class="cal-stat-row"><span class="cal-stat-label">Day off (กำหนดเอง)</span><span class="cal-stat-value" style="color:var(--warning-700)">3 วัน</span></div>
+              <div class="cal-stat-row"><span class="cal-stat-label">วันหยุดสุดสัปดาห์</span><span class="cal-stat-value">104 วัน</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-sidebar-card">
+          <div class="cal-sidebar-header">🔴 วันหยุดนักขัตฤกษ์ <span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">16 วัน</span></div>
+          <div class="cal-sidebar-body" style="padding:var(--sp-3) var(--sp-5);max-height:240px;overflow-y:auto;">
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">1 ม.ค.</div><div class="holiday-name">วันขึ้นปีใหม่</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">6 เม.ย.</div><div class="holiday-name">วันจักรี</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">13 เม.ย.</div><div class="holiday-name">สงกรานต์</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">14 เม.ย.</div><div class="holiday-name">สงกรานต์</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">15 เม.ย.</div><div class="holiday-name">สงกรานต์</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">1 พ.ค.</div><div class="holiday-name">วันแรงงาน</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">12 ส.ค.</div><div class="holiday-name">วันแม่แห่งชาติ</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">5 ธ.ค.</div><div class="holiday-name">วันพ่อแห่งชาติ</div></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--error-500)"></div><div class="holiday-date">31 ธ.ค.</div><div class="holiday-name">วันสิ้นปี</div></div>
+          </div>
+        </div>
+
+        <div class="cal-sidebar-card">
+          <div class="cal-sidebar-header">🟡 Day off (กำหนดเอง) <span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">3 วัน</span></div>
+          <div class="cal-sidebar-body" style="padding:var(--sp-3) var(--sp-5);">
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--warning-500)"></div><div class="holiday-date">16 เม.ย.</div><div class="holiday-name">ชดเชยสงกรานต์</div><button class="holiday-remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--warning-500)"></div><div class="holiday-date">2 ม.ค.</div><div class="holiday-name">หยุดต่อปีใหม่</div><button class="holiday-remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+            <div class="holiday-item"><div class="holiday-dot" style="background:var(--warning-500)"></div><div class="holiday-date">30 ธ.ค.</div><div class="holiday-name">หยุดต่อสิ้นปี</div><button class="holiday-remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+            <div class="add-dayoff">
+              <input type="date" class="input" style="font-size:13px;padding:6px 10px;">
+              <input type="text" class="input" placeholder="ชื่อวันหยุด" style="font-size:13px;padding:6px 10px;">
+              <button class="btn btn-primary btn-sm">เพิ่ม</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleOrgDropdown(e) { e&&e.stopPropagation(); document.getElementById('userDropdown').classList.remove('active'); document.getElementById('orgDropdown').classList.toggle('active'); }
+function toggleUserDropdown(e) { e&&e.stopPropagation(); document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.toggle('active'); }
+document.addEventListener('click', () => { document.getElementById('orgDropdown').classList.remove('active'); document.getElementById('userDropdown').classList.remove('active'); });
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '✅ บันทึกแล้ว';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Generate calendar
+(function() {
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+  const holidays = {0:[1,2],3:[6,13,14,15,16],4:[1],7:[12],11:[5,30,31]};
+  const dayoffs = {0:[2],3:[16],11:[30]};
+  const container = document.getElementById('calGrid');
+  const dh = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+
+  for (let m = 0; m < 12; m++) {
+    const div = document.createElement('div');
+    div.className = 'cal-month';
+    let h = `<div class="cal-month-title">${months[m]}</div><div class="cal-grid">`;
+    dh.forEach(d => h += `<div class="cal-header">${d}</div>`);
+    const fd = new Date(2026, m, 1).getDay();
+    const off = fd === 0 ? 6 : fd - 1;
+    for (let i = 0; i < off; i++) h += '<div class="cal-day empty"></div>';
+    for (let d = 1; d <= daysInMonth[m]; d++) {
+      const dow = new Date(2026, m, d).getDay();
+      const isWe = dow === 0 || dow === 6;
+      const isH = holidays[m] && holidays[m].includes(d);
+      const isDo = dayoffs[m] && dayoffs[m].includes(d);
+      let c = 'cal-day';
+      if (isH && !isDo) c += ' holiday';
+      else if (isDo) c += ' dayoff';
+      else if (isWe) c += ' weekend';
+      if (m === 3 && d === 9) c += ' today';
+      h += `<div class="${c}">${d}</div>`;
+    }
+    h += '</div>';
+    div.innerHTML = h;
+    container.appendChild(div);
+  }
+})();
+</script>
+</body>
+</html>
